@@ -342,11 +342,19 @@ func (s *UserService) GetRequestClasses(userUuid string) (*[]response.RequestCla
 				return nil, response.SERVICE_INTERR
 			}
 
+			var student models.Student
+			condition = fmt.Sprintf("id = '%d'", item.StudentID)
+			if err := s.Repo.First(&student, condition); err != nil {
+				log.Println(err)
+				return nil, response.SERVICE_INTERR
+			}
+
 			resp = append(resp, response.RequestClass{
 				Uuid:      item.Uuid,
 				ClassName: class.Name,
 				ClassCode: class.Code,
 				Teacher:   teacher.User.Name,
+				Student:   student.User.Name,
 				Status:    item.Status,
 				CreatedAt: item.CreatedAt,
 			})

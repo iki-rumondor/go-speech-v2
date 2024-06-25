@@ -26,6 +26,7 @@ type RequestClass struct {
 	ClassName string `json:"class_name"`
 	ClassCode string `json:"class_code"`
 	Teacher   string `json:"teacher"`
+	Student   string `json:"student"`
 	Status    uint   `json:"status"`
 	CreatedAt int64  `json:"created_at"`
 }
