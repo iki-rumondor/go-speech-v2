@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"path/filepath"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
@@ -284,4 +285,16 @@ func (h *MasterHandler) DeleteNote(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, response.SUCCESS_RES("Catatan Berhasil Dihapus"))
+}
+
+func (h *MasterHandler) GetClassesReport(c *gin.Context) {
+	uuid := c.Param("uuid")
+	if err := h.Service.GetClassesReport(uuid); err != nil {
+		utils.HandleError(c, err)
+		return
+	}
+
+	reportFolder := "internal/files/reports"
+	pathFile := filepath.Join(reportFolder, "class_students.pdf")
+	c.File(pathFile)
 }

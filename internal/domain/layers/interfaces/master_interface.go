@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"github.com/iki-rumondor/go-speech/internal/domain/structs/models"
+	"github.com/iki-rumondor/go-speech/internal/domain/structs/response"
 )
 
 type MasterInterface interface {
@@ -21,4 +22,6 @@ type MasterInterface interface {
 	UploadToDropbox(bookName string) error
 	GetDropboxURL(bookName string) (string, error)
 	UploadFlipbookHeyzine(pdfURL string) (map[string]interface{}, error)
+
+	LaravelClassReport(data *response.Class) error
 }

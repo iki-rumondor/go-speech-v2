@@ -3,6 +3,7 @@ package services
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/iki-rumondor/go-speech/internal/domain/layers/interfaces"
 	"github.com/iki-rumondor/go-speech/internal/domain/structs/models"
@@ -255,12 +256,16 @@ func (s *MasterService) GetClass(uuid string) (*response.Class, error) {
 			return nil, response.SERVICE_INTERR
 		}
 
+		t := time.Unix(item.CreatedAt/1000, 0)
+		formattedDate := t.Format("02-01-2006")
+
 		students = append(students, response.Student{
 			Uuid:              student.Uuid,
 			Nim:               student.Nim,
 			Name:              student.User.Name,
 			Email:             student.User.Email,
 			RegisterClassTime: item.CreatedAt,
+			RegTimeString:     formattedDate,
 		})
 	}
 
@@ -401,6 +406,20 @@ func (s *MasterService) DeleteNote(uuid string) error {
 	}
 
 	if err := s.Repo.Delete(&note, nil); err != nil {
+		log.Println(err)
+		return response.SERVICE_INTERR
+	}
+	return nil
+}
+
+func (s *MasterService) GetClassesReport(uuid string) error {
+
+	class, err := s.GetClass(uuid)
+	if err != nil {
+		return err
+	}
+
+	if err := s.Repo.LaravelClassReport(class); err != nil {
 		log.Println(err)
 		return response.SERVICE_INTERR
 	}

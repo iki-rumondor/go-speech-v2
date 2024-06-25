@@ -31,7 +31,6 @@ func StartServer(handlers *config.Handlers) *gin.Engine {
 		public.GET("/file/videos/:videoName", handlers.FileHandler.GetFileVideo)
 		public.GET("/file/subtitle/:subtitle", handlers.FileHandler.GetFileSubtitle)
 		public.GET("/file/books/:bookName", handlers.FileHandler.GetFileBook)
-
 	}
 
 	user := router.Group("api").Use(middleware.IsValidJWT())
@@ -56,6 +55,8 @@ func StartServer(handlers *config.Handlers) *gin.Engine {
 
 		admin.GET("dashboards/admin", handlers.UserHandler.DashboardAdmin)
 		admin.GET("/classes/all", handlers.MasterHandler.GetAllClasses)
+
+		admin.POST("/pdf/reports/classes/:uuid", handlers.MasterHandler.GetClassesReport)
 	}
 
 	teacher := router.Group("api").Use(middleware.IsValidJWT(), middleware.IsRole("DOSEN"), middleware.SetUserUuid())

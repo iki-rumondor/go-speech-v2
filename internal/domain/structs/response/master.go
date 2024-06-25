@@ -5,6 +5,7 @@ type Student struct {
 	Name              string `json:"name"`
 	Nim               string `json:"nim"`
 	Email             string `json:"email"`
+	RegTimeString     string `json:"reg_time_string"`
 	RegisterClassTime int64  `json:"register_class_time"`
 }
 
