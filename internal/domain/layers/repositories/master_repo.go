@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -306,11 +305,6 @@ func (r *MasterRepo) UploadFlipbookHeyzine(pdfURL string) (map[string]interface{
 	err = json.Unmarshal(body, &respData)
 	if err != nil {
 		return nil, err
-	}
-
-	if !respData["success"].(bool) {
-		log.Println(respData)
-		return nil, errors.New("something went error")
 	}
 
 	return respData, nil
