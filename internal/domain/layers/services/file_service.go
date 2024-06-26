@@ -148,7 +148,7 @@ func (s *FileService) CreateBook(fileName, title, description, classUuid string)
 		return response.SERVICE_INTERR
 	}
 
-	url := fmt.Sprintf("http://103.26.13.166/api/file/books/%s", fileName)
+	url := fmt.Sprintf("http://103.26.13.166:8080/api/file/books/%s", fileName)
 	resp, err := s.Repo.UploadFlipbookHeyzine(url)
 	if err != nil {
 		log.Println(err)
