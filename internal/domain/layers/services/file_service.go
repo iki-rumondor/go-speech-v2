@@ -206,7 +206,7 @@ func (s *FileService) DeleteBook(uuid string) error {
 		return response.SERVICE_INTERR
 	}
 
-	if err := s.Repo.Delete(&book, nil); err != nil {
+	if err := s.Repo.Delete(&book, []string{"FlipBook"}); err != nil {
 		log.Println(err)
 		return response.SERVICE_INTERR
 	}
