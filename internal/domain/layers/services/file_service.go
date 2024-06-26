@@ -285,6 +285,11 @@ func (s *FileService) GetClassBooks(classUuid string) (*[]response.Book, error) 
 
 	var resp []response.Book
 	for _, item := range model {
+		var flipbook response.FlipBook
+		if item.FlipBook != nil {
+			flipbook.Url = item.FlipBook.URL
+			flipbook.Thumbnail = item.FlipBook.Thumbnail
+		}
 		resp = append(resp, response.Book{
 			Uuid:        item.Uuid,
 			Title:       item.Title,
@@ -292,6 +297,7 @@ func (s *FileService) GetClassBooks(classUuid string) (*[]response.Book, error) 
 			FileName:    item.FileName,
 			Teacher:     teacher.User.Name,
 			CreatedAt:   item.CreatedAt,
+			FlipBook:    &flipbook,
 		})
 	}
 

@@ -15,6 +15,7 @@ type Book struct {
 	CreatedAt   int64  `gorm:"autoCreateTime:milli"`
 	UpdatedAt   int64  `gorm:"autoCreateTime:milli;autoUpdateTime:milli"`
 	Class       *Class
+	FlipBook    *FlipBook
 }
 
 func (m *Book) BeforeCreate(tx *gorm.DB) error {

@@ -34,13 +34,19 @@ type Video struct {
 }
 
 type Book struct {
-	Uuid        string `json:"uuid"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	FileName    string `json:"file_name"`
-	Teacher     string `json:"teacher"`
-	URLDropbox  string `json:"url_dropbox"`
-	CreatedAt   int64  `json:"created_at"`
+	Uuid        string    `json:"uuid"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	FileName    string    `json:"file_name"`
+	Teacher     string    `json:"teacher"`
+	URLDropbox  string    `json:"url_dropbox"`
+	CreatedAt   int64     `json:"created_at"`
+	FlipBook    *FlipBook `json:"flipbook"`
+}
+
+type FlipBook struct {
+	Url       string `json:"url"`
+	Thumbnail string `json:"thumbnail"`
 }
 
 type Note struct {
