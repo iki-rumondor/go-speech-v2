@@ -18,5 +18,6 @@ func GetAllModels() []Model {
 		{Model: models.Video{}},
 		{Model: models.Book{}},
 		{Model: models.Note{}},
+		{Model: models.FlipBook{}},
 	}
 }

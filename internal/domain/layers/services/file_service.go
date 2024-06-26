@@ -118,12 +118,6 @@ func (s *FileService) UpdateVideo(uuid string, req *request.UpdateVideo) error {
 
 func (s *FileService) CreateBook(fileName, title, description, classUuid string) error {
 
-	// resp, err := s.Repo.UploadFlipbookHeyzine("https://www.dropbox.com/scl/fi/c2gpatpiibt2u7iqb1s2w/4neJp3syRoWT.pdf?raw=1")
-	// if err != nil {
-	// 	log.Println(err)
-	// 	return response.SERVICE_INTERR
-	// }
-
 	// log.Println(resp)
 	// if err := s.Repo.UploadToDropbox(fileName); err != nil {
 	// 	log.Println(err)
@@ -150,6 +144,25 @@ func (s *FileService) CreateBook(fileName, title, description, classUuid string)
 	}
 
 	if err := s.Repo.Create(&model); err != nil {
+		log.Println(err)
+		return response.SERVICE_INTERR
+	}
+
+	url := fmt.Sprintf("http://103.26.13.166/api/file/books/%s", fileName)
+	resp, err := s.Repo.UploadFlipbookHeyzine(url)
+	if err != nil {
+		log.Println(err)
+		return response.SERVICE_INTERR
+	}
+
+	flipbook := models.FlipBook{
+		BookID:    model.ID,
+		URL:       resp["url"].(string),
+		Pdf:       resp["pdf"].(string),
+		Thumbnail: resp["thumbnail"].(string),
+	}
+
+	if err := s.Repo.Create(&flipbook); err != nil {
 		log.Println(err)
 		return response.SERVICE_INTERR
 	}
