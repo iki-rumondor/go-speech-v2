@@ -55,3 +55,16 @@ type Note struct {
 	Body      string `json:"body"`
 	CreatedAt int64  `json:"created_at"`
 }
+
+type Material struct {
+	Uuid         string `json:"uuid"`
+	Title        string `json:"title"`
+	Description  string `json:"description"`
+	BookName     string `json:"book_name"`
+	VideoUuid    string `json:"video_uuid"`
+	VideoName    string `json:"video_name"`
+	SubtitleName string `json:"subtitle_name"`
+	CreatedAt    int64  `json:"created_at"`
+	UpdateAt     int64  `json:"updated_at"`
+	Class        *Class `json:"class"`
+}

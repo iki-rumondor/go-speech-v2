@@ -368,3 +368,25 @@ func (h *MasterHandler) CreateMaterial(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, response.SUCCESS_RES("Materi Berhasil Ditambahkan"))
 }
+
+func (h *MasterHandler) GetAllMaterials(c *gin.Context) {
+	classUuid := c.Param("class_uuid")
+	resp, err := h.Service.GetAllMaterials(classUuid)
+	if err != nil {
+		utils.HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, response.DATA_RES(resp))
+}
+
+func (h *MasterHandler) GetMaterial(c *gin.Context) {
+	uuid := c.Param("uuid")
+	resp, err := h.Service.GetMaterial(uuid)
+	if err != nil {
+		utils.HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, response.DATA_RES(resp))
+}

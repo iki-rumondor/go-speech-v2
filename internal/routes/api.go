@@ -81,6 +81,8 @@ func StartServer(handlers *config.Handlers) *gin.Engine {
 		teacher.DELETE("/notes/:uuid", handlers.MasterHandler.DeleteNote)
 
 		teacher.GET("dashboards/teacher", handlers.UserHandler.DashboardTeacher)
+		teacher.GET("/materials/classes/:class_uuid", handlers.MasterHandler.GetAllMaterials)
+		teacher.GET("/materials/:uuid", handlers.MasterHandler.GetMaterial)
 		teacher.POST("/materials", handlers.MasterHandler.CreateMaterial)
 	}
 

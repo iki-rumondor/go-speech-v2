@@ -472,3 +472,78 @@ func DeleteSubtitle(subtitleName string) {
 		log.Println(err)
 	}
 }
+
+func (s *MasterService) GetAllMaterials(classUuid string) (*[]response.Material, error) {
+	var class models.Class
+	condition := fmt.Sprintf("uuid = '%s'", classUuid)
+	if err := s.Repo.First(&class, condition); err != nil {
+		return nil, response.SERVICE_INTERR
+	}
+
+	var teacher models.Teacher
+	condition = fmt.Sprintf("id = '%d'", class.TeacherID)
+	if err := s.Repo.First(&teacher, condition); err != nil {
+		return nil, response.SERVICE_INTERR
+	}
+
+	var materials []models.Material
+	condition = fmt.Sprintf("class_id = '%d'", class.ID)
+	if err := s.Repo.Find(&materials, condition, "created_at ASC"); err != nil {
+		return nil, response.SERVICE_INTERR
+	}
+
+	var resp []response.Material
+	for _, item := range materials {
+		resp = append(resp, response.Material{
+			Uuid:         item.Uuid,
+			Title:        item.Title,
+			Description:  item.Description,
+			BookName:     item.Book.FileName,
+			VideoName:    item.Video.VideoName,
+			VideoUuid:    item.Video.Uuid,
+			SubtitleName: item.Video.SubtitleName,
+			CreatedAt:    item.CreatedAt,
+			UpdateAt:     item.UpdatedAt,
+			Class: &response.Class{
+				Name:    class.Name,
+				Code:    class.Code,
+				Teacher: teacher.User.Name,
+			},
+		})
+	}
+
+	return &resp, nil
+}
+
+func (s *MasterService) GetMaterial(uuid string) (*response.Material, error) {
+	var material models.Material
+	condition := fmt.Sprintf("uuid = '%s'", uuid)
+	if err := s.Repo.First(&material, condition); err != nil {
+		return nil, response.SERVICE_INTERR
+	}
+
+	var teacher models.Teacher
+	condition = fmt.Sprintf("id = '%d'", material.Class.TeacherID)
+	if err := s.Repo.First(&teacher, condition); err != nil {
+		return nil, response.SERVICE_INTERR
+	}
+
+	var resp = response.Material{
+		Uuid:         material.Uuid,
+		Title:        material.Title,
+		Description:  material.Description,
+		BookName:     material.Book.FileName,
+		VideoName:    material.Video.VideoName,
+		VideoUuid:    material.Video.Uuid,
+		SubtitleName: material.Video.SubtitleName,
+		CreatedAt:    material.CreatedAt,
+		UpdateAt:     material.UpdatedAt,
+		Class: &response.Class{
+			Name:    material.Class.Name,
+			Code:    material.Class.Code,
+			Teacher: teacher.User.Name,
+		},
+	}
+
+	return &resp, nil
+}
