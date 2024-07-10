@@ -139,7 +139,7 @@ func (r *MasterRepo) AudioToSubtitleTranscript(audioUrl string) ([]byte, error) 
 	return vtt, nil
 }
 
-func (r *MasterRepo) UploadAudio(audioPath string) (map[string]interface{}, error) {
+func (r *MasterRepo) UploadAudioToAssembly(audioPath string) (map[string]interface{}, error) {
 	assemblyKey := os.Getenv("ASSEMBLY_KEY")
 	if assemblyKey == "" {
 		return nil, errors.New("assembly env not found")

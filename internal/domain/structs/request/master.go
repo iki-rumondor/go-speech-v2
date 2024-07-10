@@ -15,6 +15,12 @@ type Note struct {
 	Body      string `json:"body" valid:"required~field body tidak ditemukan"`
 }
 
+type Material struct {
+	ClassUuid   string `form:"class_uuid" valid:"required~field uuid class tidak ditemukan"`
+	Title       string `form:"title" valid:"required~field judul tidak ditemukan"`
+	Description string `form:"description" valid:"required~field description tidak ditemukan"`
+}
+
 type UpdateVideo struct {
 	Title       string `json:"title" valid:"required~field judul tidak ditemukan"`
 	Description string `json:"description" valid:"required~field description tidak ditemukan"`

@@ -3,8 +3,11 @@ package services
 import (
 	"fmt"
 	"log"
+	"os"
+	"path/filepath"
 	"time"
 
+	"github.com/iki-rumondor/go-speech/internal/consts"
 	"github.com/iki-rumondor/go-speech/internal/domain/layers/interfaces"
 	"github.com/iki-rumondor/go-speech/internal/domain/structs/models"
 	"github.com/iki-rumondor/go-speech/internal/domain/structs/request"
@@ -424,4 +427,48 @@ func (s *MasterService) GetClassesReport(uuid string) error {
 		return response.SERVICE_INTERR
 	}
 	return nil
+}
+
+func (s *MasterService) CreateMaterial(req *request.Material, videoName, bookName string) error {
+	var class models.Class
+	condition := fmt.Sprintf("uuid = '%s'", req.ClassUuid)
+	if err := s.Repo.First(&class, condition); err != nil {
+		log.Println(err)
+		return response.SERVICE_INTERR
+	}
+
+	subtitleName, err := s.Assembly_VideoToSubtitle(videoName)
+	if err != nil {
+		log.Println(err)
+		return &response.Error{
+			Code:    500,
+			Message: "Gagal Konversi Video To Audio AssemblyAI",
+		}
+	}
+
+	model := models.Material{
+		ClassID:     class.ID,
+		Title:       req.Title,
+		Description: req.Description,
+		Video: &models.VideoPart{
+			VideoName:    videoName,
+			SubtitleName: *subtitleName,
+		},
+		Book: &models.BookPart{
+			FileName: bookName,
+		},
+	}
+
+	if err := s.Repo.Create(&model); err != nil {
+		DeleteSubtitle(*subtitleName)
+		return response.SERVICE_INTERR
+	}
+
+	return nil
+}
+
+func DeleteSubtitle(subtitleName string) {
+	if err := os.Remove(filepath.Join(consts.SUBTITLE_FOLDER, subtitleName)); err != nil {
+		log.Println(err)
+	}
 }

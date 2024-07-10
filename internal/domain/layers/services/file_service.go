@@ -53,7 +53,7 @@ func (s *FileService) CreateVideo(pathFile, videoName, title, description, class
 		}
 	}()
 
-	result, err := s.Repo.UploadAudio(audioPath)
+	result, err := s.Repo.UploadAudioToAssembly(audioPath)
 	if err != nil {
 		log.Println(err)
 		return response.SERVICE_INTERR

@@ -16,7 +16,7 @@ func StartServer(handlers *config.Handlers) *gin.Engine {
 		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
-		AllowAllOrigins: true,
+		AllowAllOrigins:  true,
 		MaxAge:           12,
 	}))
 
@@ -81,6 +81,7 @@ func StartServer(handlers *config.Handlers) *gin.Engine {
 		teacher.DELETE("/notes/:uuid", handlers.MasterHandler.DeleteNote)
 
 		teacher.GET("dashboards/teacher", handlers.UserHandler.DashboardTeacher)
+		teacher.POST("/materials", handlers.MasterHandler.CreateMaterial)
 	}
 
 	student := router.Group("api").Use(middleware.IsValidJWT(), middleware.IsRole("MAHASISWA"), middleware.SetUserUuid())

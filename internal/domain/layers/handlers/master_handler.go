@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 
 	"github.com/asaskevich/govalidator"
@@ -297,4 +299,72 @@ func (h *MasterHandler) GetClassesReport(c *gin.Context) {
 	reportFolder := "internal/files/reports"
 	pathFile := filepath.Join(reportFolder, "class_students.pdf")
 	c.File(pathFile)
+}
+
+func (h *MasterHandler) CreateMaterial(c *gin.Context) {
+	var body request.Material
+	if err := c.Bind(&body); err != nil {
+		utils.HandleError(c, response.BADREQ_ERR(err.Error()))
+		return
+	}
+
+	if _, err := govalidator.ValidateStruct(&body); err != nil {
+		utils.HandleError(c, response.BADREQ_ERR(err.Error()))
+		return
+	}
+
+	video, err := c.FormFile("video")
+	if err != nil {
+		utils.HandleError(c, response.BADREQ_ERR(err.Error()))
+		return
+	}
+
+	if status := utils.CheckTypeFile(video, []string{"mp4", "webm"}); !status {
+		utils.HandleError(c, response.BADREQ_ERR("Tipe File Tidak Valid, Gunakan mp4 atau webm"))
+		return
+	}
+
+	book, err := c.FormFile("book")
+	if err != nil {
+		utils.HandleError(c, response.BADREQ_ERR(err.Error()))
+		return
+	}
+
+	if status := utils.CheckTypeFile(book, []string{"pdf"}); !status {
+		utils.HandleError(c, response.BADREQ_ERR("Tipe File Tidak Valid, Gunakan pdf"))
+		return
+	}
+
+	videosFolder := "internal/files/videos"
+	videoName := utils.RandomFileName(video)
+	pathVideo := filepath.Join(videosFolder, videoName)
+
+	if err := utils.SaveUploadedFile(video, pathVideo); err != nil {
+		utils.HandleError(c, response.HANDLER_INTERR)
+		return
+	}
+
+	booksFolder := "internal/files/books"
+	bookName := utils.RandomFileName(book)
+	pathBook := filepath.Join(booksFolder, bookName)
+
+	if err := utils.SaveUploadedFile(book, pathBook); err != nil {
+		utils.HandleError(c, response.HANDLER_INTERR)
+		return
+	}
+
+	if err := h.Service.CreateMaterial(&body, videoName, bookName); err != nil {
+		if err := os.Remove(pathVideo); err != nil {
+			log.Println(err.Error())
+		}
+
+		if err := os.Remove(pathBook); err != nil {
+			log.Println(err.Error())
+		}
+
+		utils.HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, response.SUCCESS_RES("Materi Berhasil Ditambahkan"))
 }

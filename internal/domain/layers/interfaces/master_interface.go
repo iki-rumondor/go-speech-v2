@@ -16,7 +16,7 @@ type MasterInterface interface {
 
 	FindStudentClasses(studentID uint, dest *[]models.Class) error
 
-	UploadAudio(audioPath string) (map[string]interface{}, error)
+	UploadAudioToAssembly(audioPath string) (map[string]interface{}, error)
 	AudioToTextAPI(audioPath string) error
 	AudioToSubtitleTranscript(audioUrl string) ([]byte, error)
 	UploadToDropbox(bookName string) error
