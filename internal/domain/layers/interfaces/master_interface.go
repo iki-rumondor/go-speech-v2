@@ -13,8 +13,10 @@ type MasterInterface interface {
 	Create(data interface{}) error
 	Update(data interface{}, condition string) error
 	Delete(data interface{}, withAssociation []string) error
+	FirstOrCreate(model interface{}, condition interface{}) error
 
 	FindStudentClasses(studentID uint, dest *[]models.Class) error
+	UpdateTeacher(teacher *models.Teacher, user *models.User) error
 
 	UploadAudioToAssembly(audioPath string) (map[string]interface{}, error)
 	AudioToTextAPI(audioPath string) error

@@ -13,12 +13,14 @@ type User struct {
 }
 
 type Teacher struct {
-	Uuid       string `json:"uuid"`
-	Name       string `json:"name"`
-	Email      string `json:"email"`
-	Nip        string `json:"nip"`
-	Department string `json:"department"`
-	Active     bool   `json:"status"`
+	Uuid           string `json:"uuid"`
+	Name           string `json:"name"`
+	Email          string `json:"email"`
+	Nip            string `json:"nip"`
+	Nidn           string `json:"nidn"`
+	Department     string `json:"department"`
+	DepartmentUuid string `json:"department_uuid"`
+	Active         bool   `json:"status"`
 }
 
 type RequestClass struct {
@@ -41,6 +43,7 @@ type DashboardTeacher struct {
 	JumlahKelas     int `json:"jumlah_kelas"`
 	JumlahBuku      int `json:"jumlah_buku"`
 	JumlahVideo     int `json:"jumlah_video"`
+	JumlahMateri    int `json:"jumlah_materi"`
 }
 
 type DashboardStudent struct {

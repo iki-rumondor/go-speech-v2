@@ -21,7 +21,18 @@ type Material struct {
 	Description string `form:"description" valid:"required~field description tidak ditemukan"`
 }
 
+type UpdateMaterial struct {
+	Title       string `json:"title" valid:"required~field judul tidak ditemukan"`
+	Description string `json:"description" valid:"required~field description tidak ditemukan"`
+}
+
 type UpdateVideo struct {
 	Title       string `json:"title" valid:"required~field judul tidak ditemukan"`
 	Description string `json:"description" valid:"required~field description tidak ditemukan"`
+}
+
+type UpdateTeacher struct {
+	Name           string `json:"name" valid:"required~field nama tidak ditemukan"`
+	Nidn           string `json:"nidn" valid:"required~field nidn tidak ditemukan"`
+	DepartmentUuid string `json:"department_uuid" valid:"required~field description tidak ditemukan"`
 }

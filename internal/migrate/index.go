@@ -42,7 +42,7 @@ func freshDatabase(db *gorm.DB) error {
 			{
 				Active:   true,
 				Name:     "Administrator",
-				Email:    "admin@admin.com",
+				Username: "admin",
 				Password: "123",
 			},
 		},

@@ -66,6 +66,24 @@ func (r *MasterRepo) FindStudentClasses(studentID uint, dest *[]models.Class) er
 	return r.db.Find(dest, "id IN (?)", subQuery).Error
 }
 
+func (r *MasterRepo) UpdateTeacher(teacher *models.Teacher, user *models.User) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Updates(user).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Updates(teacher).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
+func (r *MasterRepo) FirstOrCreate(model interface{}, condition interface{}) error {
+	return r.db.FirstOrCreate(model, condition).Error
+}
+
 func (r *MasterRepo) AudioToTextAPI(audioUrl string) error {
 	assemblyKey := os.Getenv("ASSEMBLY_KEY")
 	if assemblyKey == "" {

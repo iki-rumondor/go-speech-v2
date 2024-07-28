@@ -10,7 +10,7 @@ type Teacher struct {
 	Uuid         string `gorm:"not_null;unique;size:64"`
 	UserID       uint   `gorm:"not_null"`
 	DepartmentID uint   `gorm:"not_null"`
-	Nip          string `gorm:"not_null;unique;size:64"`
+	Nidn         string `gorm:"not_null;unique;size:64"`
 	CreatedAt    int64  `gorm:"autoCreateTime:milli"`
 	UpdatedAt    int64  `gorm:"autoCreateTime:milli;autoUpdateTime:milli"`
 	User         *User

@@ -19,6 +19,6 @@ type StatusClassReq struct {
 }
 
 type SignIn struct {
-	Email    string `json:"email" valid:"required~field email tidak ditemukan, email~Gunakan email yang valid"`
+	Email    string `json:"email" valid:"required~field email tidak ditemukan"`
 	Password string `json:"password" valid:"required~field password tidak ditemukan"`
 }

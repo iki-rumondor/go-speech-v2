@@ -46,11 +46,11 @@ func (s *UserService) CreateUser(req *request.User) error {
 
 		model = models.User{
 			Name:     req.Name,
-			Email:    req.Email,
+			Username: req.Email,
 			Password: req.Password,
 			RoleID:   uint(roleID),
 			Teacher: &models.Teacher{
-				Nip:          req.Nip,
+				Nidn:         req.Nip,
 				DepartmentID: department.ID,
 			},
 		}
@@ -62,7 +62,7 @@ func (s *UserService) CreateUser(req *request.User) error {
 		model = models.User{
 			Active:   true,
 			Name:     req.Name,
-			Email:    req.Email,
+			Username: req.Email,
 			Password: req.Password,
 			RoleID:   uint(roleID),
 			Student: &models.Student{
@@ -93,7 +93,7 @@ func (s *UserService) GetUser(uuid string) (*response.User, error) {
 
 	resp := response.User{
 		Uuid:  model.Uuid,
-		Email: model.Email,
+		Email: model.Username,
 		Name:  model.Name,
 		Role:  model.Role.Name,
 	}
@@ -135,12 +135,13 @@ func (s *UserService) GetTeachers() (*[]response.Teacher, error) {
 	var resp []response.Teacher
 	for _, item := range model {
 		resp = append(resp, response.Teacher{
-			Uuid:       item.Uuid,
-			Nip:        item.Nip,
-			Department: item.Department.Name,
-			Email:      item.User.Email,
-			Name:       item.User.Name,
-			Active:     item.User.Active,
+			Uuid:           item.Uuid,
+			Nidn:           item.Nidn,
+			Department:     item.Department.Name,
+			DepartmentUuid: item.Department.Uuid,
+			Email:          item.User.Username,
+			Name:           item.User.Name,
+			Active:         item.User.Active,
 		})
 	}
 
@@ -149,14 +150,14 @@ func (s *UserService) GetTeachers() (*[]response.Teacher, error) {
 
 func (s *UserService) VerifyUser(req *request.SignIn) (map[string]string, error) {
 	var user models.User
-	condition := fmt.Sprintf("email = '%s'", req.Email)
+	condition := fmt.Sprintf("username = '%s'", req.Email)
 	if err := s.Repo.First(&user, condition); err != nil {
 		log.Println(err)
-		return nil, response.NOTFOUND_ERR("Email atau Password Salah")
+		return nil, response.NOTFOUND_ERR("Username atau Password Salah")
 	}
 
 	if err := utils.ComparePassword(user.Password, req.Password); err != nil {
-		return nil, response.NOTFOUND_ERR("Email atau Password Salah")
+		return nil, response.NOTFOUND_ERR("Username atau Password Salah")
 	}
 
 	if !user.Active {
@@ -416,6 +417,12 @@ func (s *UserService) DashboardTeacher(userUuid string) (*response.DashboardTeac
 		return nil, response.SERVICE_INTERR
 	}
 
+	var materials []models.Material
+	if err := s.Repo.Include(&materials, "", "class_id", classIDs); err != nil {
+		log.Println(err)
+		return nil, response.SERVICE_INTERR
+	}
+
 	var videos []models.Video
 	if err := s.Repo.Include(&videos, "", "class_id", classIDs); err != nil {
 		log.Println(err)
@@ -427,6 +434,7 @@ func (s *UserService) DashboardTeacher(userUuid string) (*response.DashboardTeac
 		JumlahKelas:     len(class),
 		JumlahBuku:      len(books),
 		JumlahVideo:     len(videos),
+		JumlahMateri:    len(materials),
 	}
 
 	return &resp, nil

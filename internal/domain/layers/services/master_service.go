@@ -266,7 +266,7 @@ func (s *MasterService) GetClass(uuid string) (*response.Class, error) {
 			Uuid:              student.Uuid,
 			Nim:               student.Nim,
 			Name:              student.User.Name,
-			Email:             student.User.Email,
+			Email:             student.User.Username,
 			RegisterClassTime: item.CreatedAt,
 			RegTimeString:     formattedDate,
 		})
@@ -546,4 +546,135 @@ func (s *MasterService) GetMaterial(uuid string) (*response.Material, error) {
 	}
 
 	return &resp, nil
+}
+
+func (s *MasterService) UpdateMaterial(uuid string, req *request.UpdateMaterial) error {
+	var material models.Material
+	condition := fmt.Sprintf("uuid = '%s'", uuid)
+	if err := s.Repo.First(&material, condition); err != nil {
+		log.Println(err)
+		return response.SERVICE_INTERR
+	}
+
+	model := models.Material{
+		ID:          material.ID,
+		Title:       req.Title,
+		Description: req.Description,
+	}
+
+	if err := s.Repo.Update(&model, ""); err != nil {
+		log.Println(err)
+		return response.SERVICE_INTERR
+	}
+	return nil
+}
+
+func (s *MasterService) DeleteMaterial(uuid string) error {
+	var material models.Material
+	condition := fmt.Sprintf("uuid = '%s'", uuid)
+	if err := s.Repo.First(&material, condition); err != nil {
+		log.Println(err)
+		return response.SERVICE_INTERR
+	}
+
+	if err := s.Repo.Delete(&material, []string{"Video", "Book"}); err != nil {
+		log.Println(err)
+		return response.SERVICE_INTERR
+	}
+
+	subtitleFolder := "internal/files/subtitle"
+	subtitlePath := filepath.Join(subtitleFolder, material.Video.SubtitleName)
+
+	videoFolder := "internal/files/videos"
+	videoPath := filepath.Join(videoFolder, material.Video.VideoName)
+
+	bookFolder := "internal/files/books"
+	bookPath := filepath.Join(bookFolder, material.Book.FileName)
+
+	if err := os.Remove(subtitlePath); err != nil {
+		log.Println(err.Error())
+	}
+
+	if err := os.Remove(videoPath); err != nil {
+		log.Println(err.Error())
+	}
+
+	if err := os.Remove(bookPath); err != nil {
+		log.Println(err.Error())
+	}
+
+	return nil
+}
+
+func (s *MasterService) GetTeacher(uuid string) (*response.Teacher, error) {
+	var teacher models.Teacher
+	condition := fmt.Sprintf("uuid = '%s'", uuid)
+	if err := s.Repo.First(&teacher, condition); err != nil {
+		return nil, response.SERVICE_INTERR
+	}
+
+	var resp = response.Teacher{
+		Uuid:           teacher.Uuid,
+		Nidn:           teacher.Nidn,
+		Department:     teacher.Department.Name,
+		DepartmentUuid: teacher.Department.Uuid,
+		Email:          teacher.User.Username,
+		Name:           teacher.User.Name,
+		Active:         teacher.User.Active,
+	}
+
+	return &resp, nil
+}
+
+func (s *MasterService) UpdateTeacher(uuid string, req *request.UpdateTeacher) error {
+	var department models.Department
+	condition := fmt.Sprintf("uuid = '%s'", req.DepartmentUuid)
+	if err := s.Repo.First(&department, condition); err != nil {
+		log.Println(err)
+		return response.SERVICE_INTERR
+	}
+
+	var teacher models.Teacher
+	condition = fmt.Sprintf("uuid = '%s'", uuid)
+	if err := s.Repo.First(&teacher, condition); err != nil {
+		log.Println(err)
+		return response.SERVICE_INTERR
+	}
+
+	teacherModel := models.Teacher{
+		ID:           teacher.ID,
+		Nidn:         req.Nidn,
+		DepartmentID: department.ID,
+	}
+
+	userModel := models.User{
+		ID:       teacher.UserID,
+		Name:     req.Name,
+		Password: req.Nidn,
+		Username: req.Nidn,
+	}
+
+	if err := s.Repo.UpdateTeacher(&teacherModel, &userModel); err != nil {
+		log.Println(err)
+		if utils.IsErrorType(err) {
+			return err
+		}
+		return response.SERVICE_INTERR
+	}
+	return nil
+}
+
+func (s *MasterService) DeleteTeacher(uuid string) error {
+	var teacher models.Teacher
+	condition := fmt.Sprintf("uuid = '%s'", uuid)
+	if err := s.Repo.First(&teacher, condition); err != nil {
+		log.Println(err)
+		return response.SERVICE_INTERR
+	}
+
+	if err := s.Repo.Delete(&teacher, nil); err != nil {
+		log.Println(err)
+		return response.SERVICE_INTERR
+	}
+	return nil
 }

@@ -11,6 +11,7 @@ type Handlers struct {
 	UserHandler   *handlers.UserHandler
 	MasterHandler *handlers.MasterHandler
 	FileHandler   *handlers.FileHandler
+	ImportHandler *handlers.ImportHandler
 }
 
 func GetAppHandlers(db *gorm.DB) *Handlers {
@@ -22,6 +23,9 @@ func GetAppHandlers(db *gorm.DB) *Handlers {
 	file_service := services.NewFileService(master_repo)
 	file_handler := handlers.NewFileHandler(file_service)
 
+	import_service := services.NewImportService(master_repo)
+	import_handler := handlers.NewImportHandler(import_service)
+
 	user_repo := repositories.NewUserInterface(db)
 	user_service := services.NewUserService(user_repo)
 	user_handler := handlers.NewUserHandler(user_service)
@@ -30,5 +34,6 @@ func GetAppHandlers(db *gorm.DB) *Handlers {
 		MasterHandler: master_handler,
 		UserHandler:   user_handler,
 		FileHandler:   file_handler,
+		ImportHandler: import_handler,
 	}
 }
