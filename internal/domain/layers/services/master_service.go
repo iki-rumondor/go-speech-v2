@@ -672,7 +672,7 @@ func (s *MasterService) DeleteTeacher(uuid string) error {
 		return response.SERVICE_INTERR
 	}
 
-	if err := s.Repo.Delete(&teacher, nil); err != nil {
+	if err := s.Repo.Delete(teacher.User, []string{"Teacher"}); err != nil {
 		log.Println(err)
 		return response.SERVICE_INTERR
 	}
