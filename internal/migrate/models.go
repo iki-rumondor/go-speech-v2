@@ -22,5 +22,6 @@ func GetAllModels() []Model {
 		{Model: models.VideoPart{}},
 		{Model: models.BookPart{}},
 		{Model: models.Material{}},
+		{Model: models.StudentClasses{}},
 	}
 }

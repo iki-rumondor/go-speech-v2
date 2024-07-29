@@ -157,7 +157,7 @@ func (h *MasterHandler) GetAllClasses(c *gin.Context) {
 
 func (h *MasterHandler) GetStudentClasses(c *gin.Context) {
 	userUuid := c.Param("userUuid")
-	resp, err := h.Service.GetStudentClasses(userUuid)
+	resp, err := h.Service.GetClass(userUuid)
 	if err != nil {
 		utils.HandleError(c, err)
 		return

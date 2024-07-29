@@ -264,6 +264,44 @@ func (s *UserService) CreateClassRequest(userUuid string, req *request.ClassRequ
 	return nil
 }
 
+func (s *UserService) JoinClass(userUuid string, req *request.ClassRequest) error {
+
+	var user models.User
+	condition := fmt.Sprintf("uuid = '%s'", userUuid)
+	if err := s.Repo.First(&user, condition); err != nil {
+		log.Println(err)
+		return response.SERVICE_INTERR
+	}
+
+	var class models.Class
+	condition = fmt.Sprintf("uuid = '%s'", req.ClassUuid)
+	if err := s.Repo.First(&class, condition); err != nil {
+		log.Println(err)
+		return response.SERVICE_INTERR
+	}
+
+	var studentClasses models.StudentClasses
+	condition = fmt.Sprintf("student_id = '%d' AND class_id = '%d'", user.Student.ID, class.ID)
+	if err := s.Repo.First(&studentClasses, condition); err == nil {
+		log.Println(err)
+		return response.BADREQ_ERR("Anda Sudah Tergabung Dalam Kelas Tersebut")
+	}
+
+	model := models.StudentClasses{
+		StudentID: user.Student.ID,
+		ClassID:   class.ID,
+	}
+
+	if err := s.Repo.Create(&model); err != nil {
+		log.Println(err)
+		if utils.IsErrorType(err) {
+			return err
+		}
+		return response.SERVICE_INTERR
+	}
+	return nil
+}
+
 func (s *UserService) GetStudentRequestClasses(userUuid string) (*[]response.RequestClass, error) {
 
 	var user models.User
@@ -493,4 +531,55 @@ func (s *UserService) UpdateStatusClassReq(uuid string, req *request.StatusClass
 		return response.SERVICE_INTERR
 	}
 	return nil
+}
+
+func (s *UserService) GetAllClassesByStudent(userUuid string) (*[]response.StudentClass, error) {
+	var user models.User
+	condition := fmt.Sprintf("uuid = '%s'", userUuid)
+	if err := s.Repo.First(&user, condition); err != nil {
+		log.Println(err)
+		return nil, response.SERVICE_INTERR
+	}
+
+	var classes []models.Class
+	if err := s.Repo.Find(&classes, "", "id"); err != nil {
+		log.Println(err)
+		return nil, response.SERVICE_INTERR
+	}
+
+	var classIDs []int
+	condition = fmt.Sprintf("student_id = '%d'", user.Student.ID)
+
+	if err := s.Repo.Pluck(&models.StudentClasses{}, &classIDs, "class_id", condition); err != nil {
+		log.Println(err)
+		return nil, response.SERVICE_INTERR
+	}
+
+	var resp []response.StudentClass
+	for _, item := range classes {
+		var join = false
+		if contain := utils.CheckContainsInt(classIDs, int(item.ID)); contain {
+			join = true
+		}
+
+		var teacher models.Teacher
+		condition := fmt.Sprintf("id = '%d'", item.TeacherID)
+		if err := s.Repo.First(&teacher, condition); err != nil {
+			log.Println(err)
+			return nil, response.SERVICE_INTERR
+		}
+
+		resp = append(resp, response.StudentClass{
+			Join: join,
+			Class: &response.Class{
+				Uuid:              item.Uuid,
+				Name:              item.Name,
+				Code:              item.Code,
+				Teacher:           teacher.User.Name,
+				TeacherDepartment: teacher.Department.Name,
+			},
+		})
+	}
+
+	return &resp, nil
 }

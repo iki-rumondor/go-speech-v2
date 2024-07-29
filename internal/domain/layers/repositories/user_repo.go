@@ -47,6 +47,10 @@ func (r *UserRepo) Truncate(tableName string) error {
 	return r.db.Exec(fmt.Sprintf("TRUNCATE TABLE %s", tableName)).Error
 }
 
+func (r *UserRepo) Pluck(model, dest interface{}, columnName, condition string) error {
+	return r.db.Model(model).Where(condition).Pluck(columnName, dest).Error
+}
+
 func (r *UserRepo) FindClasses(model *[]models.Class, condition string) error {
 	return r.db.Preload(clause.Associations).Preload("Teacher.User").Preload("Teacher.Department").Find(model, condition).Error
 }

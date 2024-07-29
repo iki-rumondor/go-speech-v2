@@ -217,6 +217,8 @@ func (s *MasterService) GetStudentClasses(userUuid string) (*[]response.Class, e
 	return &resp, nil
 }
 
+
+
 func (s *MasterService) GetDepartment(uuid string) (*response.Department, error) {
 
 	var model models.Department

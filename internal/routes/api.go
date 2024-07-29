@@ -101,8 +101,9 @@ func StartServer(handlers *config.Handlers) *gin.Engine {
 	student := router.Group("api").Use(middleware.IsValidJWT(), middleware.IsRole("MAHASISWA"), middleware.SetUserUuid())
 	{
 		student.POST("/class/register", handlers.UserHandler.CreateClassRequest)
+		student.POST("/classes/join", handlers.UserHandler.JoinClass)
 		student.GET("/class/request/students", handlers.UserHandler.GetStudentRequestClasses)
-		student.GET("/classes/students/:userUuid", handlers.MasterHandler.GetStudentClasses)
+		student.GET("/classes/students/:userUuid", handlers.UserHandler.GetStudentClasses)
 
 		student.GET("dashboards/student", handlers.UserHandler.DashboardStudent)
 	}

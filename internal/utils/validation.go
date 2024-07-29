@@ -25,3 +25,12 @@ func CheckTypeFile(file *multipart.FileHeader, extensions []string) (status bool
 
 	return false
 }
+
+func CheckContainsInt(slice []int, value int) bool {
+	for _, v := range slice {
+		if v == value {
+			return true
+		}
+	}
+	return false
+}

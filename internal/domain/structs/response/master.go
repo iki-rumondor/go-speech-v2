@@ -18,6 +18,11 @@ type Class struct {
 	Students          *[]Student `json:"students"`
 }
 
+type StudentClass struct {
+	Join  bool   `json:"join"`
+	Class *Class `json:"class"`
+}
+
 type Department struct {
 	Uuid string `json:"uuid"`
 	Name string `json:"name"`

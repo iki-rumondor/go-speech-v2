@@ -13,6 +13,7 @@ type UserInterface interface {
 	Create(data interface{}) error
 	Update(data interface{}, condition string) error
 	Delete(data interface{}, withAssociation []string) error
+	Pluck(model, dest interface{}, columnName, condition string) error
 
 	FindClasses(model *[]models.Class, condition string) error
 	FindTeacherStudents(model *[]models.ClassRequest, teacherID uint) error
