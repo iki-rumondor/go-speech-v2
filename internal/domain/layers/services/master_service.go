@@ -678,3 +678,85 @@ func (s *MasterService) DeleteTeacher(uuid string) error {
 	}
 	return nil
 }
+
+func (s *MasterService) GetStudents() (*[]response.Student, error) {
+
+	var students []models.Student
+	if err := s.Repo.Find(&students, "", "created_at ASC"); err != nil {
+		return nil, response.SERVICE_INTERR
+	}
+
+	var resp []response.Student
+	for _, item := range students {
+		resp = append(resp, response.Student{
+			Uuid: item.Uuid,
+			Name: item.User.Name,
+			Nim:  item.Nim,
+		})
+	}
+
+	return &resp, nil
+}
+
+func (s *MasterService) GetStudent(uuid string) (*response.Student, error) {
+	var student models.Student
+	condition := fmt.Sprintf("uuid = '%s'", uuid)
+	if err := s.Repo.First(&student, condition); err != nil {
+		return nil, response.SERVICE_INTERR
+	}
+
+	var resp = response.Student{
+		Uuid:  student.Uuid,
+		Nim:   student.Nim,
+		Email: student.User.Username,
+		Name:  student.User.Name,
+	}
+
+	return &resp, nil
+}
+
+func (s *MasterService) UpdateStudent(uuid string, req *request.UpdateStudent) error {
+
+	var student models.Student
+	condition := fmt.Sprintf("uuid = '%s'", uuid)
+	if err := s.Repo.First(&student, condition); err != nil {
+		log.Println(err)
+		return response.SERVICE_INTERR
+	}
+
+	studentModel := models.Student{
+		ID:  student.ID,
+		Nim: req.Nim,
+	}
+
+	userModel := models.User{
+		ID:       student.UserID,
+		Name:     req.Name,
+		Password: req.Nim,
+		Username: req.Nim,
+	}
+
+	if err := s.Repo.UpdateStudent(&studentModel, &userModel); err != nil {
+		log.Println(err)
+		if utils.IsErrorType(err) {
+			return err
+		}
+		return response.SERVICE_INTERR
+	}
+	return nil
+}
+
+func (s *MasterService) DeleteStudent(uuid string) error {
+	var student models.Student
+	condition := fmt.Sprintf("uuid = '%s'", uuid)
+	if err := s.Repo.First(&student, condition); err != nil {
+		log.Println(err)
+		return response.SERVICE_INTERR
+	}
+
+	if err := s.Repo.Delete(student.User, []string{"Student"}); err != nil {
+		log.Println(err)
+		return response.SERVICE_INTERR
+	}
+	return nil
+}

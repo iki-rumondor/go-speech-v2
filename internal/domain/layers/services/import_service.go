@@ -4,6 +4,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/iki-rumondor/go-speech/internal/consts"
 	"github.com/iki-rumondor/go-speech/internal/domain/layers/interfaces"
 	"github.com/iki-rumondor/go-speech/internal/domain/structs/models"
 	"github.com/iki-rumondor/go-speech/internal/domain/structs/response"
@@ -30,12 +31,12 @@ func (s *ImportService) SaveTeachers(xlsxPath string) ([]map[string]string, erro
 
 	rows, err := f.GetRows("Daftar Dosen")
 	if err != nil {
-		log.Println("Failed to get rows Mahasiswa")
+		log.Println("Failed to get rows Daftar Dosen")
 		return nil, response.SERVICE_INTERR
 	}
 	var failedImport []map[string]string
 
-	for i := 1; i < 10; i++ {
+	for i := 1; i < len(rows); i++ {
 		cols := rows[i]
 		var department models.Department
 		var depCond = models.Department{
@@ -61,6 +62,51 @@ func (s *ImportService) SaveTeachers(xlsxPath string) ([]map[string]string, erro
 				Username: nidn,
 				Password: nidn,
 				RoleID:   2,
+				Active:   true,
+			},
+		}
+
+		if err := s.Repo.Create(&model); err != nil {
+			log.Println(err)
+			failedImport = append(failedImport, map[string]string{
+				"name":    cols[2],
+				"message": err.Error(),
+			})
+			continue
+		}
+
+	}
+
+	return failedImport, nil
+}
+
+func (s *ImportService) SaveStudents(xlsxPath string) ([]map[string]string, error) {
+	f, err := excelize.OpenFile(xlsxPath)
+	if err != nil {
+		log.Println("Gagal Membuka File")
+		return nil, response.SERVICE_INTERR
+	}
+	defer f.Close()
+
+	rows, err := f.GetRows("Daftar Mahasiswa")
+	if err != nil {
+		log.Println("Failed to get rows Daftar Mahasiswa")
+		return nil, response.SERVICE_INTERR
+	}
+	var failedImport []map[string]string
+
+	for i := 1; i < len(rows); i++ {
+		cols := rows[i]
+
+		nim := strings.ReplaceAll(cols[1], " ", "")
+
+		model := models.Student{
+			Nim: nim,
+			User: &models.User{
+				Name:     cols[2],
+				Username: nim,
+				Password: nim,
+				RoleID:   consts.STUDENT_ROLE,
 				Active:   true,
 			},
 		}

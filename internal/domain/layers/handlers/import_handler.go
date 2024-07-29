@@ -57,3 +57,39 @@ func (h *ImportHandler) ImportTeachers(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, response.DATA_RES(teachers))
 }
+
+func (h *ImportHandler) ImportStudents(c *gin.Context) {
+
+	studentsFile, err := c.FormFile("students")
+	if err != nil {
+		utils.HandleError(c, response.BADREQ_ERR(err.Error()))
+		return
+	}
+
+	if status := utils.CheckTypeFile(studentsFile, []string{"xlsx"}); !status {
+		utils.HandleError(c, response.BADREQ_ERR("Tipe File Tidak Valid, Gunakan file xlsx"))
+		return
+	}
+
+	tempFolder := "internal/files/temp"
+	tempPath := filepath.Join(tempFolder, studentsFile.Filename)
+
+	if err := utils.SaveUploadedFile(studentsFile, tempPath); err != nil {
+		utils.HandleError(c, response.HANDLER_INTERR)
+		return
+	}
+
+	defer func() {
+		if err := os.Remove(tempPath); err != nil {
+			log.Println(err.Error())
+		}
+	}()
+
+	teachers, err := h.Service.SaveStudents(tempPath)
+	if err != nil {
+		utils.HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, response.DATA_RES(teachers))
+}

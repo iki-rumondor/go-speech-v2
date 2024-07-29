@@ -57,6 +57,12 @@ func StartServer(handlers *config.Handlers) *gin.Engine {
 		admin.DELETE("/teachers/:uuid", handlers.MasterHandler.DeleteTeacher)
 		admin.PATCH("/teacher/:uuid/activate", handlers.UserHandler.ActivateUser)
 
+		admin.GET("/students", handlers.MasterHandler.GetStudents)
+		admin.GET("/students/:uuid", handlers.MasterHandler.GetStudent)
+		admin.POST("/students/import", handlers.ImportHandler.ImportStudents)
+		admin.PUT("/students/:uuid", handlers.MasterHandler.UpdateStudent)
+		admin.DELETE("/students/:uuid", handlers.MasterHandler.DeleteStudent)
+
 		admin.GET("dashboards/admin", handlers.UserHandler.DashboardAdmin)
 		admin.GET("/classes/all", handlers.MasterHandler.GetAllClasses)
 

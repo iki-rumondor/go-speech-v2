@@ -80,6 +80,20 @@ func (r *MasterRepo) UpdateTeacher(teacher *models.Teacher, user *models.User) e
 	})
 }
 
+func (r *MasterRepo) UpdateStudent(student *models.Student, user *models.User) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Updates(user).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Updates(student).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
 func (r *MasterRepo) FirstOrCreate(model interface{}, condition interface{}) error {
 	return r.db.FirstOrCreate(model, condition).Error
 }
