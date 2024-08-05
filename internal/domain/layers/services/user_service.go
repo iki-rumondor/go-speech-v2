@@ -535,15 +535,24 @@ func (s *UserService) UpdateStatusClassReq(uuid string, req *request.StatusClass
 
 func (s *UserService) GetAllClassesByStudent(userUuid string) (*[]response.StudentClass, error) {
 
-	classes, err := s.Repo.FindStundetClasses(userUuid)
+	studentClassesIDs, err := s.Repo.FindStudentClasses(userUuid)
 	if err != nil {
 		return nil, response.SERVICE_INTERR
 	}
 
-	var resp []response.StudentClass
-	for _, item := range *classes {
+	var classes []models.Class
+	if err := s.Repo.FindClasses(&classes, ""); err != nil {
+		return nil, response.SERVICE_INTERR
+	}
 
+	var resp []response.StudentClass
+	for _, item := range classes {
+		var join bool
+		if utils.CheckContainsInt(*studentClassesIDs, int(item.ID)) {
+			join = true
+		}
 		resp = append(resp, response.StudentClass{
+			Join: join,
 			Class: &response.Class{
 				Uuid:              item.Uuid,
 				Name:              item.Name,

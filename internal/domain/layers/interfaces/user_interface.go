@@ -20,5 +20,5 @@ type UserInterface interface {
 	SelectColumn(model interface{}, condition, columnName string) *gorm.DB
 	Include(model interface{}, condition, colName string, selectCols *gorm.DB) error
 
-	FindStundetClasses(userUuid string) (*[]models.Class, error)
+	FindStudentClasses(userUuid string) (*[]int, error)
 }
