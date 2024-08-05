@@ -534,49 +534,22 @@ func (s *UserService) UpdateStatusClassReq(uuid string, req *request.StatusClass
 }
 
 func (s *UserService) GetAllClassesByStudent(userUuid string) (*[]response.StudentClass, error) {
-	var user models.User
-	condition := fmt.Sprintf("uuid = '%s'", userUuid)
-	if err := s.Repo.First(&user, condition); err != nil {
-		log.Println(err)
-		return nil, response.SERVICE_INTERR
-	}
 
-	var classes []models.Class
-	if err := s.Repo.Find(&classes, "", "id"); err != nil {
-		log.Println(err)
-		return nil, response.SERVICE_INTERR
-	}
-
-	var classIDs []int
-	condition = fmt.Sprintf("student_id = '%d'", user.Student.ID)
-
-	if err := s.Repo.Pluck(&models.StudentClasses{}, &classIDs, "class_id", condition); err != nil {
-		log.Println(err)
+	classes, err := s.Repo.FindStundetClasses(userUuid)
+	if err != nil {
 		return nil, response.SERVICE_INTERR
 	}
 
 	var resp []response.StudentClass
-	for _, item := range classes {
-		var join = false
-		if contain := utils.CheckContainsInt(classIDs, int(item.ID)); contain {
-			join = true
-		}
-
-		var teacher models.Teacher
-		condition := fmt.Sprintf("id = '%d'", item.TeacherID)
-		if err := s.Repo.First(&teacher, condition); err != nil {
-			log.Println(err)
-			return nil, response.SERVICE_INTERR
-		}
+	for _, item := range *classes {
 
 		resp = append(resp, response.StudentClass{
-			Join: join,
 			Class: &response.Class{
 				Uuid:              item.Uuid,
 				Name:              item.Name,
 				Code:              item.Code,
-				Teacher:           teacher.User.Name,
-				TeacherDepartment: teacher.Department.Name,
+				Teacher:           item.Teacher.User.Name,
+				TeacherDepartment: item.Teacher.Department.Name,
 			},
 		})
 	}

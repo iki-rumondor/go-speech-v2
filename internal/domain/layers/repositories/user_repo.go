@@ -70,6 +70,25 @@ func (r *UserRepo) Include(model interface{}, condition, colName string, selectC
 	return r.db.Where(condition).Find(model, conds, selectCols).Error
 }
 
+func (r *UserRepo) FindStundetClasses(userUuid string) (*[]models.Class, error) {
+	var user models.User
+	if err := r.db.Preload("Student").First(&user, "uuid = ?", userUuid).Error; err != nil {
+		return nil, err
+	}
+
+	var studentClassesIDs []int64
+	if err := r.db.Model(&models.StudentClasses{}).Where("student_id = ?", user.Student.ID).Pluck("class_id", &studentClassesIDs).Error; err != nil {
+		return nil, err
+	}
+
+	var class []models.Class
+	if err := r.db.Preload("Teacher.Department").Preload("Teacher.User").Find(&class, "id IN (?)", studentClassesIDs).Error; err != nil {
+		return nil, err
+	}
+
+	return &class, nil
+}
+
 // func (r *UserRepo) FindTeacherClassReq(dest *[]models.ClassRequest, teacherID uint) error {
 // 	subQuery := r.db.Model(&models.Class{}).Where("academic_year_id = ?", yearID).Select("facility_id")
 // 	return r.db.Preload(clause.Associations).Preload("Teacher.User").Preload("Teacher.Department").Find(model, condition).Error

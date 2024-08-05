@@ -19,4 +19,6 @@ type UserInterface interface {
 	FindTeacherStudents(model *[]models.ClassRequest, teacherID uint) error
 	SelectColumn(model interface{}, condition, columnName string) *gorm.DB
 	Include(model interface{}, condition, colName string, selectCols *gorm.DB) error
+
+	FindStundetClasses(userUuid string) (*[]models.Class, error)
 }
