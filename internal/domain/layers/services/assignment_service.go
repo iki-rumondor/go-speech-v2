@@ -81,6 +81,59 @@ func (s *AssignmentService) FindAssignmentByClass(classUuid string) (*[]response
 	return &resp, nil
 }
 
+func (s *AssignmentService) FindAssignmentByStudent(studentUuid string) (*[]response.Assignment, error) {
+
+	student, err := s.Repo.FirstStudentByUuid(studentUuid)
+	if err != nil {
+		log.Println(err)
+		return nil, response.SERVICE_INTERR
+	}
+
+	assignments, err := s.Repo.FindAssignmentsByStudent(studentUuid)
+	if err != nil {
+		log.Println(err)
+		return nil, response.SERVICE_INTERR
+	}
+
+	var resp []response.Assignment
+	for _, item := range *assignments {
+		answer, err := s.Repo.FirstAnswerByUser(student.User.Uuid, item.Uuid)
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, err
+		}
+
+		var studentAnswer response.Answer
+		if answer != nil {
+			studentAnswer = response.Answer{
+				Uuid:      answer.Uuid,
+				Ontime:    answer.Ontime,
+				Filename:  answer.Filename,
+				Grade:     answer.Grade,
+				Submitted: true,
+				Student: &response.Student{
+					Name: student.User.Name,
+					Nim:  student.Nim,
+				},
+			}
+		}
+
+		resp = append(resp, response.Assignment{
+			Uuid:          item.Uuid,
+			Title:         item.Title,
+			Description:   item.Description,
+			Deadline:      item.Deadline,
+			CreatedAt:     item.CreatedAt,
+			UpdatedAt:     item.UpdatedAt,
+			StudentAnswer: &studentAnswer,
+			Class: &response.Class{
+				Name: item.Class.Name,
+			},
+		})
+	}
+
+	return &resp, nil
+}
+
 func (s *AssignmentService) FindAssignmentsByUser(userUuid, classUuid string) (*[]response.Assignment, error) {
 
 	assignments, err := s.Repo.FindAssignmentsByClass(classUuid)

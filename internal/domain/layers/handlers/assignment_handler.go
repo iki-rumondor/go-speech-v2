@@ -71,6 +71,18 @@ func (h *AssignmentHandler) FindAssignmentByClass(c *gin.Context) {
 
 func (h *AssignmentHandler) FindAssignmentByStudent(c *gin.Context) {
 
+	studentUuid := c.Param("studentUuid")
+	resp, err := h.Service.FindAssignmentByStudent(studentUuid)
+	if err != nil {
+		utils.HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, response.DATA_RES(resp))
+}
+
+func (h *AssignmentHandler) FindAssignmentByUser(c *gin.Context) {
+
 	classUuid := c.Param("classUuid")
 	userUuid := c.GetString("uuid")
 	if userUuid == "" {

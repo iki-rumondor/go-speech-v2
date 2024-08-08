@@ -27,4 +27,5 @@ type MasterInterface interface {
 	UploadFlipbookHeyzine(pdfURL string) (map[string]interface{}, error)
 
 	LaravelClassReport(data *response.Class) error
+	LaravelStudentAssignmentsReport(data map[string]interface{}) error
 }

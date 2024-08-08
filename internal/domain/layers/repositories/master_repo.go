@@ -387,3 +387,49 @@ func (r *MasterRepo) LaravelClassReport(data *response.Class) error {
 
 	return nil
 }
+
+func (r *MasterRepo) LaravelStudentAssignmentsReport(data map[string]interface{}) error {
+	pdfUrl := os.Getenv("PDF_API_URL")
+	if pdfUrl == "" {
+		return errors.New("pdf url not found")
+	}
+
+	dataJSON, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	url := fmt.Sprintf("%s/class_students", pdfUrl)
+
+	req, err := http.NewRequest("POST", url, bytes.NewReader(dataJSON))
+	if err != nil {
+		return err
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	folderPath := "internal/files/reports"
+	fileName := "class_students.pdf"
+
+	filePath := filepath.Join(folderPath, fileName)
+
+	if err := os.MkdirAll(folderPath, 0755); err != nil {
+		return err
+	}
+
+	if err = os.WriteFile(filePath, body, 0644); err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -43,7 +43,7 @@ func (r *AssignmentRepo) FindAssignmentsByClass(classUuid string) (*[]models.Ass
 
 func (r *AssignmentRepo) FindAssignmentsByUser(userUuid string) (*[]models.Assignment, error) {
 	var user models.User
-	if err := r.db.Preload("Student").Preload("Class.Teacher.User").First(&user, "uuid = ?", userUuid).Error; err != nil {
+	if err := r.db.Preload("Class.Teacher.User").First(&user, "uuid = ?", userUuid).Error; err != nil {
 		return nil, err
 	}
 
@@ -59,12 +59,38 @@ func (r *AssignmentRepo) FindAssignmentsByUser(userUuid string) (*[]models.Assig
 	return &assignments, nil
 }
 
+func (r *AssignmentRepo) FindAssignmentsByStudent(studentUuid string) (*[]models.Assignment, error) {
+	var student models.Student
+	if err := r.db.First(&student, "uuid = ?", studentUuid).Error; err != nil {
+		return nil, err
+	}
+
+	var studentClasses []uint
+	if err := r.db.Model(&models.StudentClasses{}).Where("student_id = ?", student.ID).Pluck("class_id", &studentClasses).Error; err != nil {
+		return nil, err
+	}
+
+	var assignments []models.Assignment
+	if err := r.db.Preload("Class").Find(&assignments, "class_id IN (?)", studentClasses).Error; err != nil {
+		return nil, err
+	}
+	return &assignments, nil
+}
+
 func (r *AssignmentRepo) FirstAssignmentByUuid(uuid string) (*models.Assignment, error) {
 	var assignment models.Assignment
 	if err := r.db.Preload("Answers").First(&assignment, "uuid = ?", uuid).Error; err != nil {
 		return nil, err
 	}
 	return &assignment, nil
+
+}
+func (r *AssignmentRepo) FirstStudentByUuid(uuid string) (*models.Student, error) {
+	var student models.Student
+	if err := r.db.Preload("User").First(&student, "uuid = ?", uuid).Error; err != nil {
+		return nil, err
+	}
+	return &student, nil
 }
 
 func (r *AssignmentRepo) UpdateAssignment(model *models.Assignment) error {
@@ -113,6 +139,6 @@ func (r *AssignmentRepo) UpdateAnswer(answerUuid string, model *models.Answer) e
 		return err
 	}
 	model.ID = answer.ID
-	
+
 	return r.db.Updates(model).Error
 }

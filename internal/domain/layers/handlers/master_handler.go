@@ -301,6 +301,18 @@ func (h *MasterHandler) GetClassesReport(c *gin.Context) {
 	c.File(pathFile)
 }
 
+func (h *MasterHandler) GetStudentAssignmentsReport(c *gin.Context) {
+	uuid := c.Param("uuid")
+	if err := h.Service.GetClassesReport(uuid); err != nil {
+		utils.HandleError(c, err)
+		return
+	}
+
+	reportFolder := "internal/files/reports"
+	pathFile := filepath.Join(reportFolder, "class_students.pdf")
+	c.File(pathFile)
+}
+
 func (h *MasterHandler) CreateMaterial(c *gin.Context) {
 	var body request.Material
 	if err := c.Bind(&body); err != nil {

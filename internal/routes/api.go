@@ -70,6 +70,7 @@ func StartServer(handlers *config.Handlers) *gin.Engine {
 		admin.GET("dashboards/admin", handlers.UserHandler.DashboardAdmin)
 
 		admin.POST("/pdf/reports/classes/:uuid", handlers.MasterHandler.GetClassesReport)
+		admin.GET("/assignments/students/:studentUuid", handlers.AssignmentHandler.FindAssignmentByStudent)
 	}
 
 	teacher := router.Group("api").Use(middleware.IsValidJWT(), middleware.IsRole("DOSEN"), middleware.SetUserUuid())
@@ -115,7 +116,7 @@ func StartServer(handlers *config.Handlers) *gin.Engine {
 		student.GET("/classes/students/:userUuid", handlers.UserHandler.GetStudentClasses)
 
 		student.GET("dashboards/student", handlers.UserHandler.DashboardStudent)
-		student.GET("/assignments/students/classes/:classUuid", handlers.AssignmentHandler.FindAssignmentByStudent)
+		student.GET("/assignments/students/classes/:classUuid", handlers.AssignmentHandler.FindAssignmentByUser)
 		student.POST("/answers/assignments/:assignmentUuid", handlers.AssignmentHandler.UploadAnswer)
 	}
 

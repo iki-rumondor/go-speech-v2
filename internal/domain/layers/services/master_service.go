@@ -217,8 +217,6 @@ func (s *MasterService) GetStudentClasses(userUuid string) (*[]response.Class, e
 	return &resp, nil
 }
 
-
-
 func (s *MasterService) GetDepartment(uuid string) (*response.Department, error) {
 
 	var model models.Department
@@ -245,15 +243,15 @@ func (s *MasterService) GetClass(uuid string) (*response.Class, error) {
 		return nil, response.SERVICE_INTERR
 	}
 
-	var classReq []models.ClassRequest
-	condition = fmt.Sprintf("class_id = '%d' AND status = '%d'", model.ID, 2)
-	if err := s.Repo.Find(&classReq, condition, "id"); err != nil {
+	var studentClasses []models.StudentClasses
+	condition = fmt.Sprintf("class_id = '%d'", model.ID)
+	if err := s.Repo.Find(&studentClasses, condition, "id"); err != nil {
 		log.Println(err)
 		return nil, response.SERVICE_INTERR
 	}
 
 	var students []response.Student
-	for _, item := range classReq {
+	for _, item := range studentClasses {
 		var student models.Student
 		condition = fmt.Sprintf("id = '%d'", item.StudentID)
 		if err := s.Repo.First(&student, condition); err != nil {
