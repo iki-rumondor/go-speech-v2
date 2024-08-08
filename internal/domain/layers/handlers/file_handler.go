@@ -230,3 +230,10 @@ func (h *FileHandler) GetFileBook(c *gin.Context) {
 	pathFile := filepath.Join(tempFolder, bookName)
 	c.File(pathFile)
 }
+
+func (h *FileHandler) GetFileAnswer(c *gin.Context) {
+	filename := c.Param("filename")
+	tempFolder := "internal/files/answers"
+	pathFile := filepath.Join(tempFolder, filename)
+	c.File(pathFile)
+}

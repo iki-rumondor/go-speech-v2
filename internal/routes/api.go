@@ -31,6 +31,7 @@ func StartServer(handlers *config.Handlers) *gin.Engine {
 		public.GET("/file/videos/:videoName", handlers.FileHandler.GetFileVideo)
 		public.GET("/file/subtitle/:subtitle", handlers.FileHandler.GetFileSubtitle)
 		public.GET("/file/books/:bookName", handlers.FileHandler.GetFileBook)
+		public.GET("/file/answers/:filename", handlers.FileHandler.GetFileAnswer)
 	}
 
 	user := router.Group("api").Use(middleware.IsValidJWT())
@@ -96,6 +97,14 @@ func StartServer(handlers *config.Handlers) *gin.Engine {
 		teacher.POST("/materials", handlers.MasterHandler.CreateMaterial)
 		teacher.PUT("/materials/:uuid", handlers.MasterHandler.UpdateMaterial)
 		teacher.DELETE("/materials/:uuid", handlers.MasterHandler.DeleteMaterial)
+
+		teacher.POST("/assignments", handlers.AssignmentHandler.CreateAssignment)
+		teacher.GET("/assignments/classes/:classUuid", handlers.AssignmentHandler.FindAssignmentByClass)
+		teacher.GET("/assignments/:uuid", handlers.AssignmentHandler.FirstAssignmentByUuid)
+		teacher.PUT("/assignments/:uuid", handlers.AssignmentHandler.UpdateAssignment)
+		teacher.DELETE("/assignments/:uuid", handlers.AssignmentHandler.DeleteAssignment)
+
+		teacher.PATCH("/answers/:answerUuid/grading", handlers.AssignmentHandler.GradeAnswer)
 	}
 
 	student := router.Group("api").Use(middleware.IsValidJWT(), middleware.IsRole("MAHASISWA"), middleware.SetUserUuid())
@@ -106,6 +115,8 @@ func StartServer(handlers *config.Handlers) *gin.Engine {
 		student.GET("/classes/students/:userUuid", handlers.UserHandler.GetStudentClasses)
 
 		student.GET("dashboards/student", handlers.UserHandler.DashboardStudent)
+		student.GET("/assignments/students/classes/:classUuid", handlers.AssignmentHandler.FindAssignmentByStudent)
+		student.POST("/answers/assignments/:assignmentUuid", handlers.AssignmentHandler.UploadAnswer)
 	}
 
 	return router

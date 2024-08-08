@@ -23,5 +23,7 @@ func GetAllModels() []Model {
 		{Model: models.BookPart{}},
 		{Model: models.Material{}},
 		{Model: models.StudentClasses{}},
+		{Model: models.Assignment{}},
+		{Model: models.Answer{}},
 	}
 }

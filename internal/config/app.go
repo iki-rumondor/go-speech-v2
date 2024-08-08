@@ -8,10 +8,11 @@ import (
 )
 
 type Handlers struct {
-	UserHandler   *handlers.UserHandler
-	MasterHandler *handlers.MasterHandler
-	FileHandler   *handlers.FileHandler
-	ImportHandler *handlers.ImportHandler
+	UserHandler       *handlers.UserHandler
+	MasterHandler     *handlers.MasterHandler
+	FileHandler       *handlers.FileHandler
+	ImportHandler     *handlers.ImportHandler
+	AssignmentHandler *handlers.AssignmentHandler
 }
 
 func GetAppHandlers(db *gorm.DB) *Handlers {
@@ -30,10 +31,15 @@ func GetAppHandlers(db *gorm.DB) *Handlers {
 	user_service := services.NewUserService(user_repo)
 	user_handler := handlers.NewUserHandler(user_service)
 
+	assignment_repo := repositories.NewAssignmentInterface(db)
+	assignment_service := services.NewAssignmentService(assignment_repo)
+	assignment_handler := handlers.NewAssignmentHandler(assignment_service)
+
 	return &Handlers{
-		MasterHandler: master_handler,
-		UserHandler:   user_handler,
-		FileHandler:   file_handler,
-		ImportHandler: import_handler,
+		MasterHandler:     master_handler,
+		UserHandler:       user_handler,
+		FileHandler:       file_handler,
+		ImportHandler:     import_handler,
+		AssignmentHandler: assignment_handler,
 	}
 }
