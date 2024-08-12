@@ -44,6 +44,26 @@ func (h *MasterHandler) CreateClass(c *gin.Context) {
 	c.JSON(http.StatusCreated, response.SUCCESS_RES("Kelas Berhasil Ditambahkan"))
 }
 
+func (h *MasterHandler) CreateSubject(c *gin.Context) {
+	var body request.Class
+	if err := c.BindJSON(&body); err != nil {
+		utils.HandleError(c, response.BADREQ_ERR(err.Error()))
+		return
+	}
+
+	if _, err := govalidator.ValidateStruct(&body); err != nil {
+		utils.HandleError(c, response.BADREQ_ERR(err.Error()))
+		return
+	}
+
+	if err := h.Service.CreateSubject(&body); err != nil {
+		utils.HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, response.SUCCESS_RES("Mata Kuliah Berhasil Ditambahkan"))
+}
+
 func (h *MasterHandler) DeleteClass(c *gin.Context) {
 
 	uuid := c.Param("uuid")

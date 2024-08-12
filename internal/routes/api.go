@@ -73,6 +73,7 @@ func StartServer(handlers *config.Handlers) *gin.Engine {
 		admin.POST("/pdf/reports/classes/:uuid", handlers.MasterHandler.GetClassesReport)
 		admin.GET("/assignments/students/:studentUuid", handlers.AssignmentHandler.FindAssignmentByStudent)
 		admin.POST("/classes", handlers.MasterHandler.CreateClass)
+		admin.POST("/subjects", handlers.MasterHandler.CreateSubject)
 		admin.PUT("/classes/:uuid", handlers.MasterHandler.UpdateClass)
 		admin.DELETE("/classes/:uuid", handlers.MasterHandler.DeleteClass)
 		admin.GET("/classes/request", handlers.UserHandler.GetRequestClasses)

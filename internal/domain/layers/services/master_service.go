@@ -49,6 +49,31 @@ func (s *MasterService) CreateClass(req *request.Class) error {
 	return nil
 }
 
+func (s *MasterService) CreateSubject(req *request.Class) error {
+	var teacher models.Teacher
+	condition := fmt.Sprintf("uuid = '%s'", req.TeacherUuid)
+	if err := s.Repo.First(&teacher, condition); err != nil {
+		log.Println(err)
+		return response.SERVICE_INTERR
+	}
+
+	model := models.Class{
+		IsSubject: true,
+		TeacherID: teacher.ID,
+		Name:      req.Name,
+		Code:      req.Code,
+	}
+
+	if err := s.Repo.Create(&model); err != nil {
+		log.Println(err)
+		if utils.IsErrorType(err) {
+			return err
+		}
+		return response.SERVICE_INTERR
+	}
+	return nil
+}
+
 func (s *MasterService) DeleteClass(classUuid string) error {
 
 	var model models.Class
@@ -159,7 +184,7 @@ func (s *MasterService) GetTeacherClasses(userUuid string) (*[]response.Class, e
 func (s *MasterService) GetAllClasses() (*[]response.Class, error) {
 
 	var model []models.Class
-	condition := fmt.Sprintf("is_subject = '%t'", false)
+	condition := fmt.Sprintf("is_subject = %t", false)
 	if err := s.Repo.Find(&model, condition, "id"); err != nil {
 		log.Println(err)
 		return nil, response.SERVICE_INTERR
@@ -188,7 +213,7 @@ func (s *MasterService) GetAllClasses() (*[]response.Class, error) {
 func (s *MasterService) GetAllSubjects() (*[]response.Class, error) {
 
 	var model []models.Class
-	condition := fmt.Sprintf("is_subject = '%t'", true)
+	condition := fmt.Sprintf("is_subject = %t", true)
 	if err := s.Repo.Find(&model, condition, "id"); err != nil {
 		log.Println(err)
 		return nil, response.SERVICE_INTERR
