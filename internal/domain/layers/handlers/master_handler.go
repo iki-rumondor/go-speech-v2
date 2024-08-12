@@ -36,13 +36,7 @@ func (h *MasterHandler) CreateClass(c *gin.Context) {
 		return
 	}
 
-	userUuid := c.GetString("uuid")
-	if userUuid == "" {
-		utils.HandleError(c, response.HANDLER_INTERR)
-		return
-	}
-
-	if err := h.Service.CreateClass(userUuid, &body); err != nil {
+	if err := h.Service.CreateClass(&body); err != nil {
 		utils.HandleError(c, err)
 		return
 	}
@@ -51,15 +45,10 @@ func (h *MasterHandler) CreateClass(c *gin.Context) {
 }
 
 func (h *MasterHandler) DeleteClass(c *gin.Context) {
-	userUuid := c.GetString("uuid")
-	if userUuid == "" {
-		utils.HandleError(c, response.HANDLER_INTERR)
-		return
-	}
 
 	uuid := c.Param("uuid")
 
-	if err := h.Service.DeleteClass(userUuid, uuid); err != nil {
+	if err := h.Service.DeleteClass(uuid); err != nil {
 		utils.HandleError(c, err)
 		return
 	}
@@ -129,14 +118,14 @@ func (h *MasterHandler) GetAllDepartment(c *gin.Context) {
 	c.JSON(http.StatusOK, response.DATA_RES(resp))
 }
 
-func (h *MasterHandler) GetClasses(c *gin.Context) {
+func (h *MasterHandler) GetTeacherClasses(c *gin.Context) {
 	userUuid := c.GetString("uuid")
 	if userUuid == "" {
 		utils.HandleError(c, response.HANDLER_INTERR)
 		return
 	}
 
-	resp, err := h.Service.GetClasses(userUuid)
+	resp, err := h.Service.GetTeacherClasses(userUuid)
 	if err != nil {
 		utils.HandleError(c, err)
 		return
@@ -147,6 +136,16 @@ func (h *MasterHandler) GetClasses(c *gin.Context) {
 
 func (h *MasterHandler) GetAllClasses(c *gin.Context) {
 	resp, err := h.Service.GetAllClasses()
+	if err != nil {
+		utils.HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, response.DATA_RES(resp))
+}
+
+func (h *MasterHandler) GetAllSubjects(c *gin.Context) {
+	resp, err := h.Service.GetAllSubjects()
 	if err != nil {
 		utils.HandleError(c, err)
 		return
@@ -202,12 +201,7 @@ func (h *MasterHandler) UpdateClass(c *gin.Context) {
 	}
 
 	uuid := c.Param("uuid")
-	userUuid := c.GetString("uuid")
-	if userUuid == "" {
-		utils.HandleError(c, response.HANDLER_INTERR)
-		return
-	}
-	if err := h.Service.UpdateClass(userUuid, uuid, &body); err != nil {
+	if err := h.Service.UpdateClass(uuid, &body); err != nil {
 		utils.HandleError(c, err)
 		return
 	}

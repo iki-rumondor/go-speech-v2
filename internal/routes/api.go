@@ -45,6 +45,7 @@ func StartServer(handlers *config.Handlers) *gin.Engine {
 		user.GET("/materials/classes/:class_uuid", handlers.MasterHandler.GetAllMaterials)
 		user.GET("/materials/:uuid", handlers.MasterHandler.GetMaterial)
 		user.GET("/classes/all", handlers.MasterHandler.GetAllClasses)
+		user.GET("/subjects/all", handlers.MasterHandler.GetAllSubjects)
 	}
 
 	admin := router.Group("api").Use(middleware.IsValidJWT(), middleware.IsRole("ADMIN"))
@@ -71,17 +72,16 @@ func StartServer(handlers *config.Handlers) *gin.Engine {
 
 		admin.POST("/pdf/reports/classes/:uuid", handlers.MasterHandler.GetClassesReport)
 		admin.GET("/assignments/students/:studentUuid", handlers.AssignmentHandler.FindAssignmentByStudent)
+		admin.POST("/classes", handlers.MasterHandler.CreateClass)
+		admin.PUT("/classes/:uuid", handlers.MasterHandler.UpdateClass)
+		admin.DELETE("/classes/:uuid", handlers.MasterHandler.DeleteClass)
+		admin.GET("/classes/request", handlers.UserHandler.GetRequestClasses)
+		admin.PATCH("/classes/:uuid/request", handlers.UserHandler.UpdateStatusClassReq)
 	}
 
 	teacher := router.Group("api").Use(middleware.IsValidJWT(), middleware.IsRole("DOSEN"), middleware.SetUserUuid())
 	{
-		teacher.POST("/classes", handlers.MasterHandler.CreateClass)
-		teacher.GET("/classes", handlers.MasterHandler.GetClasses)
-		teacher.PUT("/classes/:uuid", handlers.MasterHandler.UpdateClass)
-		teacher.DELETE("/classes/:uuid", handlers.MasterHandler.DeleteClass)
-		teacher.GET("/classes/request", handlers.UserHandler.GetRequestClasses)
-		teacher.PATCH("/classes/:uuid/request", handlers.UserHandler.UpdateStatusClassReq)
-
+		teacher.GET("/classes", handlers.MasterHandler.GetTeacherClasses)
 		teacher.POST("/videos", handlers.FileHandler.CreateVideo)
 		teacher.PUT("/videos/:uuid", handlers.FileHandler.UpdateVideo)
 		teacher.DELETE("/videos/:uuid", handlers.FileHandler.DeleteVideo)

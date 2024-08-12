@@ -94,6 +94,30 @@ func (r *MasterRepo) UpdateStudent(student *models.Student, user *models.User) e
 	})
 }
 
+func (r *MasterRepo) DeleteClass(model *models.Class) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
+
+		var assignmentsIDs []uint
+		if err := r.db.Model(&models.Assignment{}).Pluck("id", &assignmentsIDs).Error; err != nil {
+			return err
+		}
+
+		if err := r.db.Delete(&models.Answer{}, "assignment_id IN (?)", assignmentsIDs).Error; err != nil {
+			return err
+		}
+
+		if err := r.db.Delete(&models.Assignment{}, "class_id = ?", model.ID).Error; err != nil {
+			return err
+		}
+
+		if err := r.db.Delete(model).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
 func (r *MasterRepo) FirstOrCreate(model interface{}, condition interface{}) error {
 	return r.db.FirstOrCreate(model, condition).Error
 }

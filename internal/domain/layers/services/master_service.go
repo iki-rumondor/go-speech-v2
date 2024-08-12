@@ -25,16 +25,16 @@ func NewMasterService(repo interfaces.MasterInterface) *MasterService {
 	}
 }
 
-func (s *MasterService) CreateClass(userUuid string, req *request.Class) error {
-	var user models.User
-	condition := fmt.Sprintf("uuid = '%s'", userUuid)
-	if err := s.Repo.First(&user, condition); err != nil {
+func (s *MasterService) CreateClass(req *request.Class) error {
+	var teacher models.Teacher
+	condition := fmt.Sprintf("uuid = '%s'", req.TeacherUuid)
+	if err := s.Repo.First(&teacher, condition); err != nil {
 		log.Println(err)
 		return response.SERVICE_INTERR
 	}
 
 	model := models.Class{
-		TeacherID: user.Teacher.ID,
+		TeacherID: teacher.ID,
 		Name:      req.Name,
 		Code:      req.Code,
 	}
@@ -49,23 +49,16 @@ func (s *MasterService) CreateClass(userUuid string, req *request.Class) error {
 	return nil
 }
 
-func (s *MasterService) DeleteClass(userUuid, classUuid string) error {
-
-	var user models.User
-	condition := fmt.Sprintf("uuid = '%s'", userUuid)
-	if err := s.Repo.First(&user, condition); err != nil {
-		log.Println(err)
-		return response.SERVICE_INTERR
-	}
+func (s *MasterService) DeleteClass(classUuid string) error {
 
 	var model models.Class
-	condition = fmt.Sprintf("teacher_id = '%d' AND uuid = '%s'", user.Teacher.ID, classUuid)
+	condition := fmt.Sprintf("uuid = '%s'", classUuid)
 	if err := s.Repo.First(&model, condition); err != nil {
 		log.Println(err)
 		return response.SERVICE_INTERR
 	}
 
-	if err := s.Repo.Delete(&model, nil); err != nil {
+	if err := s.Repo.DeleteClass(&model); err != nil {
 		log.Println(err)
 		return response.SERVICE_INTERR
 	}
@@ -136,7 +129,7 @@ func (s *MasterService) GetAllDepartment() (*[]response.Department, error) {
 	return &resp, nil
 }
 
-func (s *MasterService) GetClasses(userUuid string) (*[]response.Class, error) {
+func (s *MasterService) GetTeacherClasses(userUuid string) (*[]response.Class, error) {
 	var user models.User
 	condition := fmt.Sprintf("uuid = '%s'", userUuid)
 	if err := s.Repo.First(&user, condition); err != nil {
@@ -166,7 +159,37 @@ func (s *MasterService) GetClasses(userUuid string) (*[]response.Class, error) {
 func (s *MasterService) GetAllClasses() (*[]response.Class, error) {
 
 	var model []models.Class
-	if err := s.Repo.Find(&model, "", "id"); err != nil {
+	condition := fmt.Sprintf("is_subject = '%t'", false)
+	if err := s.Repo.Find(&model, condition, "id"); err != nil {
+		log.Println(err)
+		return nil, response.SERVICE_INTERR
+	}
+
+	var resp []response.Class
+	for _, item := range model {
+		var teacher models.Teacher
+		condition := fmt.Sprintf("id = '%d'", item.TeacherID)
+		if err := s.Repo.First(&teacher, condition); err != nil {
+			return nil, response.SERVICE_INTERR
+		}
+
+		resp = append(resp, response.Class{
+			Uuid:              item.Uuid,
+			Name:              item.Name,
+			Code:              item.Code,
+			Teacher:           teacher.User.Name,
+			TeacherDepartment: teacher.Department.Name,
+		})
+	}
+
+	return &resp, nil
+}
+
+func (s *MasterService) GetAllSubjects() (*[]response.Class, error) {
+
+	var model []models.Class
+	condition := fmt.Sprintf("is_subject = '%t'", true)
+	if err := s.Repo.Find(&model, condition, "id"); err != nil {
 		log.Println(err)
 		return nil, response.SERVICE_INTERR
 	}
@@ -273,34 +296,36 @@ func (s *MasterService) GetClass(uuid string) (*response.Class, error) {
 	}
 
 	var resp = response.Class{
-		Uuid:     model.Uuid,
-		Name:     model.Name,
-		Code:     model.Code,
-		Students: &students,
+		Uuid:        model.Uuid,
+		Name:        model.Name,
+		Code:        model.Code,
+		TeacherUuid: model.Teacher.Uuid,
+		Students:    &students,
 	}
 
 	return &resp, nil
 }
 
-func (s *MasterService) UpdateClass(userUuid, uuid string, req *request.Class) error {
-	var user models.User
-	condition := fmt.Sprintf("uuid = '%s'", userUuid)
-	if err := s.Repo.First(&user, condition); err != nil {
+func (s *MasterService) UpdateClass(uuid string, req *request.Class) error {
+	var teacher models.Teacher
+	condition := fmt.Sprintf("uuid = '%s'", req.TeacherUuid)
+	if err := s.Repo.First(&teacher, condition); err != nil {
 		log.Println(err)
 		return response.SERVICE_INTERR
 	}
 
 	var class models.Class
-	condition = fmt.Sprintf("uuid = '%s' AND teacher_id = '%d'", uuid, user.Teacher.ID)
+	condition = fmt.Sprintf("uuid = '%s'", uuid)
 	if err := s.Repo.First(&class, condition); err != nil {
 		log.Println(err)
 		return response.SERVICE_INTERR
 	}
 
 	model := models.Class{
-		ID:   class.ID,
-		Name: req.Name,
-		Code: req.Code,
+		ID:        class.ID,
+		Name:      req.Name,
+		Code:      req.Code,
+		TeacherID: teacher.ID,
 	}
 
 	if err := s.Repo.Update(&model, ""); err != nil {

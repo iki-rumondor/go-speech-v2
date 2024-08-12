@@ -15,6 +15,7 @@ type MasterInterface interface {
 	Delete(data interface{}, withAssociation []string) error
 	FirstOrCreate(model interface{}, condition interface{}) error
 
+	DeleteClass(model *models.Class) error
 	FindStudentClasses(studentID uint, dest *[]models.Class) error
 	UpdateTeacher(teacher *models.Teacher, user *models.User) error
 	UpdateStudent(student *models.Student, user *models.User) error

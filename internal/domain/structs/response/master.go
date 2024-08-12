@@ -13,7 +13,8 @@ type Class struct {
 	Uuid              string     `json:"uuid"`
 	Name              string     `json:"name"`
 	Code              string     `json:"code" `
-	Teacher           string     `json:"teacher" `
+	Teacher           string     `json:"teacher"`
+	TeacherUuid       string     `json:"teacher_uuid"`
 	TeacherDepartment string     `json:"teacher_department" `
 	Students          *[]Student `json:"students"`
 }

@@ -12,11 +12,13 @@ type Class struct {
 	TeacherID      uint   `gorm:"not_null"`
 	Name           string `gorm:"not_null;size:32"`
 	Code           string `gorm:"not_null;unique;size:8"`
+	IsSubject      bool   `gorm:"not_null"`
 	CreatedAt      int64  `gorm:"autoCreateTime:milli"`
 	UpdatedAt      int64  `gorm:"autoCreateTime:milli;autoUpdateTime:milli"`
 	Teacher        *Teacher
 	ClassRequests  *[]ClassRequest
 	StudentClasses *[]StudentClasses
+	Assignments    *[]Assignment
 }
 
 func (m *Class) BeforeCreate(tx *gorm.DB) error {
