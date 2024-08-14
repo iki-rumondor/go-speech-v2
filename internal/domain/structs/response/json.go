@@ -23,3 +23,11 @@ type Answer struct {
 	UpdatedAt int64    `json:"updated_at"`
 	Student   *Student `json:"student"`
 }
+
+type Notification struct {
+	Uuid      string `json:"uuid"`
+	Title     string `json:"title"`
+	Body      string `json:"body"`
+	CreatedAt int64  `json:"created_at"`
+	UpdatedAt int64  `json:"updated_at"`
+}

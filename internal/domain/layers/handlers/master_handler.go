@@ -545,3 +545,13 @@ func (h *MasterHandler) DeleteStudent(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, response.SUCCESS_RES("Data Mahasiswa Berhasil Dihapus"))
 }
+
+func (h *MasterHandler) GetNotifications(c *gin.Context) {
+	resp, err := h.Service.GetNotifications()
+	if err != nil {
+		utils.HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, response.DATA_RES(resp))
+}

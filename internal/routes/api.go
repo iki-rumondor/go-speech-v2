@@ -46,6 +46,7 @@ func StartServer(handlers *config.Handlers) *gin.Engine {
 		user.GET("/materials/:uuid", handlers.MasterHandler.GetMaterial)
 		user.GET("/classes/all", handlers.MasterHandler.GetAllClasses)
 		user.GET("/subjects/all", handlers.MasterHandler.GetAllSubjects)
+		user.GET("/notifications", handlers.MasterHandler.GetNotifications)
 	}
 
 	admin := router.Group("api").Use(middleware.IsValidJWT(), middleware.IsRole("ADMIN"))

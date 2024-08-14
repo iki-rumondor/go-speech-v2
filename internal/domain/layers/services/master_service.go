@@ -46,6 +46,16 @@ func (s *MasterService) CreateClass(req *request.Class) error {
 		}
 		return response.SERVICE_INTERR
 	}
+
+	notif := models.Notification{
+		Title: "Kelas Baru",
+		Body:  fmt.Sprintf("Kelas Baru dengan Nama %s dan Pengajar %s Berhasil Dibuat", model.Name, teacher.User.Name),
+	}
+
+	if err := s.Repo.Create(&notif); err != nil {
+		log.Println(err)
+	}
+
 	return nil
 }
 
@@ -71,6 +81,16 @@ func (s *MasterService) CreateSubject(req *request.Class) error {
 		}
 		return response.SERVICE_INTERR
 	}
+
+	notif := models.Notification{
+		Title: "Mata Kuliah Baru",
+		Body:  fmt.Sprintf("Mata Kuliah Baru dengan Nama %s dan Pengajar %s Berhasil Dibuat", model.Name, teacher.User.Name),
+	}
+
+	if err := s.Repo.Create(&notif); err != nil {
+		log.Println(err)
+	}
+
 	return nil
 }
 
@@ -809,4 +829,26 @@ func (s *MasterService) DeleteStudent(uuid string) error {
 		return response.SERVICE_INTERR
 	}
 	return nil
+}
+
+func (s *MasterService) GetNotifications() (*[]response.Notification, error) {
+
+	var notifications []models.Notification
+	if err := s.Repo.Find(&notifications, "", "created_at ASC"); err != nil {
+		log.Println(err)
+		return nil, response.SERVICE_INTERR
+	}
+
+	var resp []response.Notification
+	for _, item := range notifications {
+		resp = append(resp, response.Notification{
+			Uuid:      item.Uuid,
+			Title:     item.Title,
+			Body:      item.Body,
+			CreatedAt: item.CreatedAt,
+			UpdatedAt: item.UpdatedAt,
+		})
+	}
+
+	return &resp, nil
 }
