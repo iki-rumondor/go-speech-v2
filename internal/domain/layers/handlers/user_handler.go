@@ -262,3 +262,19 @@ func (h *UserHandler) JoinClass(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response.SUCCESS_RES("Berhasil Menambahkan Kelas Baru"))
 }
+
+func (h *UserHandler) GetNotifications(c *gin.Context) {
+	userUuid := c.GetString("uuid")
+	if userUuid == "" {
+		utils.HandleError(c, response.BADREQ_ERR("Uuid User Tidak Ditemukan"))
+		return
+	}
+
+	resp, err := h.Service.GetClassNotifacations(userUuid)
+	if err != nil {
+		utils.HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, response.DATA_RES(resp))
+}

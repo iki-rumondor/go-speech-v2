@@ -1,8 +1,12 @@
 package repositories
 
 import (
+	"fmt"
+	"log"
+
 	"github.com/iki-rumondor/go-speech/internal/domain/layers/interfaces"
 	"github.com/iki-rumondor/go-speech/internal/domain/structs/models"
+	"github.com/iki-rumondor/go-speech/internal/utils"
 	"gorm.io/gorm"
 )
 
@@ -18,11 +22,26 @@ func NewAssignmentInterface(db *gorm.DB) interfaces.AssignmentInterface {
 
 func (r *AssignmentRepo) CreateAssignment(classUuid string, model *models.Assignment) error {
 	var class models.Class
-	if err := r.db.First(&class, "uuid = ?", classUuid).Error; err != nil {
+	if err := r.db.Preload("Teacher.User").First(&class, "uuid = ?", classUuid).Error; err != nil {
 		return err
 	}
 	model.ClassID = class.ID
-	return r.db.Create(model).Error
+
+	if err := r.db.Create(model).Error; err != nil {
+		return err
+	}
+
+	notification := models.ClassNotification{
+		ClassID: class.ID,
+		Title:   "Tugas Baru",
+		Body:    fmt.Sprintf("Tugas telah ditambahkan oleh %s dengan deadline pada tanggal %s", class.Teacher.User.Name, utils.UnixToDate(model.Deadline)),
+	}
+
+	if err := r.db.Create(&notification).Error; err != nil {
+		log.Println(err)
+	}
+
+	return nil
 }
 
 func (r *AssignmentRepo) DeleteAssignment(uuid string) error {

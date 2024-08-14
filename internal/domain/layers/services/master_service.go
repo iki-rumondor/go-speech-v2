@@ -534,6 +534,22 @@ func (s *MasterService) CreateMaterial(req *request.Material, videoName, bookNam
 		return response.SERVICE_INTERR
 	}
 
+	var teacher models.Teacher
+	condition = fmt.Sprintf("id = '%d'", class.TeacherID)
+	if err := s.Repo.First(&teacher, condition); err != nil {
+		log.Println(err)
+	}
+
+	notification := models.ClassNotification{
+		ClassID: class.ID,
+		Title:   "Materi Baru",
+		Body:    fmt.Sprintf("materi telah ditambahkan oleh %s dengan judul materi %s", teacher.User.Name, model.Title),
+	}
+
+	if err := s.Repo.Create(&notification); err != nil {
+		log.Println(err)
+	}
+
 	return nil
 }
 

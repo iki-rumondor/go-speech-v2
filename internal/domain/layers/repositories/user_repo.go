@@ -84,7 +84,26 @@ func (r *UserRepo) FindStudentClasses(userUuid string) (*[]int, error) {
 	return &studentClassesIDs, nil
 }
 
-// func (r *UserRepo) FindTeacherClassReq(dest *[]models.ClassRequest, teacherID uint) error {
-// 	subQuery := r.db.Model(&models.Class{}).Where("academic_year_id = ?", yearID).Select("facility_id")
-// 	return r.db.Preload(clause.Associations).Preload("Teacher.User").Preload("Teacher.Department").Find(model, condition).Error
-// }
+//	func (r *UserRepo) FindTeacherClassReq(dest *[]models.ClassRequest, teacherID uint) error {
+//		subQuery := r.db.Model(&models.Class{}).Where("academic_year_id = ?", yearID).Select("facility_id")
+//		return r.db.Preload(clause.Associations).Preload("Teacher.User").Preload("Teacher.Department").Find(model, condition).Error
+//	}
+
+func (r *UserRepo) FindClassNotifications(userUuid string) (*[]models.ClassNotification, error) {
+	var user models.User
+	if err := r.db.Preload("Student").First(&user, "uuid = ?", userUuid).Error; err != nil {
+		return nil, err
+	}
+
+	var classIDs []uint
+	if err := r.db.Model(&models.StudentClasses{}).Where("student_id = ?", user.Student.ID).Pluck("class_id", &classIDs).Error; err != nil {
+		return nil, err
+	}
+
+	var notifications []models.ClassNotification
+	if err := r.db.Find(&notifications, "class_id IN (?)", classIDs).Error; err != nil {
+		return nil, err
+	}
+
+	return &notifications, nil
+}

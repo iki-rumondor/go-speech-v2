@@ -21,4 +21,5 @@ type UserInterface interface {
 	Include(model interface{}, condition, colName string, selectCols *gorm.DB) error
 
 	FindStudentClasses(userUuid string) (*[]int, error)
+	FindClassNotifications(userUuid string) (*[]models.ClassNotification, error)
 }

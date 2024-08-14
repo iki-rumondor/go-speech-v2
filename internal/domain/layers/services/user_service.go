@@ -565,3 +565,22 @@ func (s *UserService) GetAllClassesByStudent(userUuid string) (*[]response.Stude
 
 	return &resp, nil
 }
+
+func (s *UserService) GetClassNotifacations(userUuid string) (*[]response.Notification, error) {
+
+	notifications, err := s.Repo.FindClassNotifications(userUuid)
+	if err != nil {
+		return nil, response.SERVICE_INTERR
+	}
+
+	var resp []response.Notification
+	for _, item := range *notifications {
+		resp = append(resp, response.Notification{
+			Title:     item.Title,
+			Body:      item.Body,
+			CreatedAt: item.CreatedAt,
+		})
+	}
+
+	return &resp, nil
+}

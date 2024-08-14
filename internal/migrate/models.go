@@ -26,5 +26,6 @@ func GetAllModels() []Model {
 		{Model: models.Assignment{}},
 		{Model: models.Answer{}},
 		{Model: models.Notification{}},
+		{Model: models.ClassNotification{}},
 	}
 }

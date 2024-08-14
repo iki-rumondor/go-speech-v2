@@ -46,7 +46,6 @@ func StartServer(handlers *config.Handlers) *gin.Engine {
 		user.GET("/materials/:uuid", handlers.MasterHandler.GetMaterial)
 		user.GET("/classes/all", handlers.MasterHandler.GetAllClasses)
 		user.GET("/subjects/all", handlers.MasterHandler.GetAllSubjects)
-		user.GET("/notifications", handlers.MasterHandler.GetNotifications)
 	}
 
 	admin := router.Group("api").Use(middleware.IsValidJWT(), middleware.IsRole("ADMIN"))
@@ -120,6 +119,7 @@ func StartServer(handlers *config.Handlers) *gin.Engine {
 		student.GET("dashboards/student", handlers.UserHandler.DashboardStudent)
 		student.GET("/assignments/students/classes/:classUuid", handlers.AssignmentHandler.FindAssignmentByUser)
 		student.POST("/answers/assignments/:assignmentUuid", handlers.AssignmentHandler.UploadAnswer)
+		student.GET("/notifications", handlers.UserHandler.GetNotifications)
 	}
 
 	return router

@@ -21,3 +21,8 @@ func IsAfterUnix(unixTime int64) bool {
 	now := time.Now().In(location)
 	return now.After(deadline)
 }
+
+func UnixToDate(unixTime int64) string {
+	deadline := time.UnixMilli(unixTime).In(location)
+	return deadline.Format("02/01/2006")
+}
