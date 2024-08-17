@@ -110,6 +110,23 @@ func (r *MasterRepo) DeleteClass(model *models.Class) error {
 			return err
 		}
 
+		if err := r.db.Delete(&models.StudentClasses{}, "class_id = ?", model.ID).Error; err != nil {
+			return err
+		}
+
+		var notificationIDs []uint
+		if err := r.db.Model(&models.ClassNotification{}).Pluck("id", &notificationIDs).Error; err != nil {
+			return err
+		}
+
+		if err := r.db.Delete(&models.ReadNotification{}, "notification_id IN (?)", model.ID).Error; err != nil {
+			return err
+		}
+
+		if err := r.db.Delete(&models.ClassNotification{}, "class_id = ?", model.ID).Error; err != nil {
+			return err
+		}
+
 		if err := r.db.Delete(model).Error; err != nil {
 			return err
 		}
