@@ -31,6 +31,7 @@ type Notification struct {
 	IsRead    bool   `json:"is_read"`
 	CreatedAt int64  `json:"created_at"`
 	UpdatedAt int64  `json:"updated_at"`
+	Class     *Class `json:"class"`
 }
 
 type StudentInformation struct {

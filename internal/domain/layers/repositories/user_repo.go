@@ -101,7 +101,7 @@ func (r *UserRepo) FindClassNotifications(userUuid string) (*[]models.ClassNotif
 	}
 
 	var notifications []models.ClassNotification
-	if err := r.db.Order("id DESC").Find(&notifications, "class_id IN (?)", classIDs).Error; err != nil {
+	if err := r.db.Order("created_at DESC").Preload("Class").Find(&notifications, "class_id IN (?)", classIDs).Error; err != nil {
 		return nil, err
 	}
 

@@ -592,6 +592,9 @@ func (s *UserService) GetClassNotifications(userUuid string) (*[]response.Notifi
 			IsRead:    isRead,
 			Body:      item.Body,
 			CreatedAt: item.CreatedAt,
+			Class: &response.Class{
+				Uuid: item.Class.Uuid,
+			},
 		})
 	}
 
