@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -270,9 +271,47 @@ func (h *UserHandler) GetNotifications(c *gin.Context) {
 		return
 	}
 
-	resp, err := h.Service.GetClassNotifacations(userUuid)
+	resp, err := h.Service.GetClassNotifications(userUuid)
 	if err != nil {
 		utils.HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, response.DATA_RES(resp))
+}
+
+func (h *UserHandler) ReadNotification(c *gin.Context) {
+	var body []request.ReadNotification
+	if err := c.BindJSON(&body); err != nil {
+		log.Println(err.Error())
+		return
+	}
+
+	userUuid := c.GetString("uuid")
+	if userUuid == "" {
+		log.Println("Uuid User Tidak Ditemukan")
+		return
+	}
+
+	if err := h.Service.ReadNotification(userUuid, &body); err != nil {
+		log.Println(err)
+		return
+	}
+
+	log.Println("Berhasil Membaca Notifikasi")
+}
+
+func (h *UserHandler) GetStudentInformation(c *gin.Context) {
+
+	userUuid := c.GetString("uuid")
+	if userUuid == "" {
+		log.Println("Uuid User Tidak Ditemukan")
+		return
+	}
+
+	resp, err := h.Service.GetStudentInformation(userUuid)
+	if err != nil {
+		log.Println(err)
 		return
 	}
 

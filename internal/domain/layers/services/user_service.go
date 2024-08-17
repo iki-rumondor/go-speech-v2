@@ -566,20 +566,60 @@ func (s *UserService) GetAllClassesByStudent(userUuid string) (*[]response.Stude
 	return &resp, nil
 }
 
-func (s *UserService) GetClassNotifacations(userUuid string) (*[]response.Notification, error) {
+func (s *UserService) GetClassNotifications(userUuid string) (*[]response.Notification, error) {
 
 	notifications, err := s.Repo.FindClassNotifications(userUuid)
 	if err != nil {
 		return nil, response.SERVICE_INTERR
 	}
 
+	unreadNotifications, err := s.Repo.GetUnreadNotification(userUuid)
+	if err != nil {
+		return nil, response.SERVICE_INTERR
+	}
+
 	var resp []response.Notification
 	for _, item := range *notifications {
+		var isRead = true
+		for _, i := range *unreadNotifications {
+			if item.ID == i.ID {
+				isRead = false
+			}
+		}
 		resp = append(resp, response.Notification{
+			Uuid:      item.Uuid,
 			Title:     item.Title,
+			IsRead:    isRead,
 			Body:      item.Body,
 			CreatedAt: item.CreatedAt,
 		})
+	}
+
+	return &resp, nil
+}
+
+func (s *UserService) ReadNotification(userUuid string, req *[]request.ReadNotification) error {
+
+	for _, item := range *req {
+		if err := s.Repo.ReadNotification(userUuid, item.NotificationUuid); err != nil {
+			log.Println(err)
+			continue
+		}
+	}
+
+	return nil
+}
+
+func (s *UserService) GetStudentInformation(userUuid string) (*response.StudentInformation, error) {
+
+	notifications, err := s.Repo.GetUnreadNotification(userUuid)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	resp := response.StudentInformation{
+		UnreadNotification: len(*notifications),
 	}
 
 	return &resp, nil

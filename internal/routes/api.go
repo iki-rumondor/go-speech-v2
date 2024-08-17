@@ -111,6 +111,8 @@ func StartServer(handlers *config.Handlers) *gin.Engine {
 
 	student := router.Group("api").Use(middleware.IsValidJWT(), middleware.IsRole("MAHASISWA"), middleware.SetUserUuid())
 	{
+		student.GET("/informations/students", handlers.UserHandler.GetStudentInformation)
+
 		student.POST("/class/register", handlers.UserHandler.CreateClassRequest)
 		student.POST("/classes/join", handlers.UserHandler.JoinClass)
 		student.GET("/class/request/students", handlers.UserHandler.GetStudentRequestClasses)
@@ -120,6 +122,7 @@ func StartServer(handlers *config.Handlers) *gin.Engine {
 		student.GET("/assignments/students/classes/:classUuid", handlers.AssignmentHandler.FindAssignmentByUser)
 		student.POST("/answers/assignments/:assignmentUuid", handlers.AssignmentHandler.UploadAnswer)
 		student.GET("/notifications", handlers.UserHandler.GetNotifications)
+		student.POST("/notifications/read", handlers.UserHandler.ReadNotification)
 	}
 
 	return router

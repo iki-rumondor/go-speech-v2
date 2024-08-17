@@ -22,4 +22,7 @@ type UserInterface interface {
 
 	FindStudentClasses(userUuid string) (*[]int, error)
 	FindClassNotifications(userUuid string) (*[]models.ClassNotification, error)
+	ReadNotification(userUuid, notificationUuid string) error
+	GetReadNotifications(userUuid string) (*[]models.ReadNotification, error)
+	GetUnreadNotification(userUuid string) (*[]models.ClassNotification, error)
 }

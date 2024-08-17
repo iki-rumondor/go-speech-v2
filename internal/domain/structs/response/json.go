@@ -28,6 +28,11 @@ type Notification struct {
 	Uuid      string `json:"uuid"`
 	Title     string `json:"title"`
 	Body      string `json:"body"`
+	IsRead    bool   `json:"is_read"`
 	CreatedAt int64  `json:"created_at"`
 	UpdatedAt int64  `json:"updated_at"`
+}
+
+type StudentInformation struct {
+	UnreadNotification int `json:"unread_notification"`
 }

@@ -15,3 +15,7 @@ type UpdateAssignment struct {
 type Grading struct {
 	Grade int `json:"grade" valid:"required~field nilai tidak ditemukan, int~tipe data tidak valid, range(1|100)~range nilai dari 1 - 100"`
 }
+
+type ReadNotification struct {
+	NotificationUuid string `json:"notification_uuid"`
+}

@@ -101,7 +101,63 @@ func (r *UserRepo) FindClassNotifications(userUuid string) (*[]models.ClassNotif
 	}
 
 	var notifications []models.ClassNotification
-	if err := r.db.Find(&notifications, "class_id IN (?)", classIDs).Error; err != nil {
+	if err := r.db.Order("id DESC").Find(&notifications, "class_id IN (?)", classIDs).Error; err != nil {
+		return nil, err
+	}
+
+	return &notifications, nil
+}
+
+func (r *UserRepo) ReadNotification(userUuid, notificationUuid string) error {
+	var user models.User
+	if err := r.db.Preload("Student").First(&user, "uuid = ?", userUuid).Error; err != nil {
+		return err
+	}
+
+	var notification models.ClassNotification
+	if err := r.db.First(&notification, "uuid = ?", notificationUuid).Error; err != nil {
+		return err
+	}
+
+	if row := r.db.First(&models.ReadNotification{}, "student_id = ? AND notification_id = ?", user.Student.ID, notification.ID).RowsAffected; row != 0 {
+		return fmt.Errorf("notifikasi sudah dibaca")
+	}
+
+	model := models.ReadNotification{
+		NotificationID: notification.ID,
+		StudentID:      user.Student.ID,
+	}
+
+	return r.db.Create(&model).Error
+}
+
+func (r *UserRepo) GetReadNotifications(userUuid string) (*[]models.ReadNotification, error) {
+	var user models.User
+	if err := r.db.Preload("Student").First(&user).Error; err != nil {
+		return nil, err
+	}
+
+	var resp []models.ReadNotification
+	if err := r.db.Find(&resp, "student_id = ?", user.Student.ID).Error; err != nil {
+		return nil, err
+	}
+
+	return &resp, nil
+}
+
+func (r *UserRepo) GetUnreadNotification(userUuid string) (*[]models.ClassNotification, error) {
+	var user models.User
+	if err := r.db.Preload("Student").First(&user).Error; err != nil {
+		return nil, err
+	}
+
+	var notificationIDs []uint
+	if err := r.db.Model(&models.ReadNotification{}).Pluck("notification_id", &notificationIDs).Error; err != nil {
+		return nil, err
+	}
+
+	var notifications []models.ClassNotification
+	if err := r.db.Find(&notifications, "id NOT IN (?)", notificationIDs).Error; err != nil {
 		return nil, err
 	}
 
