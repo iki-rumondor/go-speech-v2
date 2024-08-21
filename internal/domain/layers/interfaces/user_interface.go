@@ -25,4 +25,7 @@ type UserInterface interface {
 	ReadNotification(userUuid, notificationUuid string) error
 	GetReadNotifications(userUuid string) (*[]models.ReadNotification, error)
 	GetUnreadNotification(userUuid string) (*[]models.ClassNotification, error)
+	GetStudentsByClass(classUuid string) (*[]models.Student, error)
+
+	GetDashboardStudent(studentID uint) (map[string]interface{}, error)
 }

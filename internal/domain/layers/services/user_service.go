@@ -473,6 +473,10 @@ func (s *UserService) DashboardTeacher(userUuid string) (*response.DashboardTeac
 		JumlahBuku:      len(books),
 		JumlahVideo:     len(videos),
 		JumlahMateri:    len(materials),
+		Teacher: &response.Teacher{
+			Name: user.Name,
+			Nidn: user.Teacher.Nidn,
+		},
 	}
 
 	return &resp, nil
@@ -501,9 +505,21 @@ func (s *UserService) DashboardStudent(userUuid string) (*response.DashboardStud
 		return nil, response.SERVICE_INTERR
 	}
 
+	dashboardData, err := s.Repo.GetDashboardStudent(user.Student.ID)
+	if err != nil {
+		log.Println(err)
+		return nil, response.SERVICE_INTERR
+	}
+
 	resp := response.DashboardStudent{
 		JumlahKelasVerified: len(classVerified),
 		JumlahKelasNot:      len(classNot),
+		JumlahMateri:        dashboardData["jumlah_materi"].(int),
+		JumlahTugas:         dashboardData["jumlah_tugas"].(int),
+		Student: &response.Student{
+			Name: user.Name,
+			Nim:  user.Student.Nim,
+		},
 	}
 
 	return &resp, nil
@@ -623,6 +639,26 @@ func (s *UserService) GetStudentInformation(userUuid string) (*response.StudentI
 
 	resp := response.StudentInformation{
 		UnreadNotification: len(*notifications),
+	}
+
+	return &resp, nil
+}
+
+func (s *UserService) GetStudentsByClass(classUuid string) (*[]response.Student, error) {
+
+	students, err := s.Repo.GetStudentsByClass(classUuid)
+	if err != nil {
+		log.Println(err)
+		return nil, response.SERVICE_INTERR
+	}
+
+	var resp []response.Student
+
+	for _, item := range *students {
+		resp = append(resp, response.Student{
+			Name: item.User.Name,
+			Nim:  item.Nim,
+		})
 	}
 
 	return &resp, nil

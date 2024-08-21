@@ -163,3 +163,48 @@ func (r *UserRepo) GetUnreadNotification(userUuid string) (*[]models.ClassNotifi
 
 	return &notifications, nil
 }
+
+func (r *UserRepo) GetStudentsByClass(classUuid string) (*[]models.Student, error) {
+	var class models.Class
+	if err := r.db.First(&class, "uuid = ?", classUuid).Error; err != nil {
+		return nil, err
+	}
+
+	var studentIDs []uint
+	if err := r.db.Model(&models.StudentClasses{}).Where("class_id = ?", class.ID).Pluck("student_id", &studentIDs).Error; err != nil {
+		return nil, err
+	}
+
+	var students []models.Student
+	if err := r.db.Preload("User").Find(&students, "id IN (?)", studentIDs).Error; err != nil {
+		return nil, err
+	}
+
+	return &students, nil
+
+}
+
+func (r *UserRepo) GetDashboardStudent(studentID uint) (map[string]interface{}, error) {
+	var classIDs []uint
+	if err := r.db.Model(&models.StudentClasses{}).Where("student_id = ?", studentID).Pluck("class_id", &classIDs).Error; err != nil {
+		return nil, err
+	}
+
+	var materials []models.Material
+	if err := r.db.Find(&materials, "class_id IN (?)", classIDs).Error; err != nil {
+		return nil, err
+	}
+
+	var assignments []models.Assignment
+	if err := r.db.Find(&assignments, "class_id IN (?)", classIDs).Error; err != nil {
+		return nil, err
+	}
+
+	resp := map[string]interface{}{
+		"jumlah_materi": len(materials),
+		"jumlah_tugas":  len(assignments),
+	}
+
+	return resp, nil
+
+}

@@ -317,3 +317,16 @@ func (h *UserHandler) GetStudentInformation(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response.DATA_RES(resp))
 }
+
+func (h *UserHandler) GetStudentsByClass(c *gin.Context) {
+
+	classUuid := c.Param("classUuid")
+
+	resp, err := h.Service.GetStudentsByClass(classUuid)
+	if err != nil {
+		utils.HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, response.DATA_RES(resp))
+}

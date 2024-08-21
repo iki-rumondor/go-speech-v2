@@ -39,14 +39,18 @@ type DashboardAdmin struct {
 }
 
 type DashboardTeacher struct {
-	JumlahMahasiswa int `json:"jumlah_mahasiswa"`
-	JumlahKelas     int `json:"jumlah_kelas"`
-	JumlahBuku      int `json:"jumlah_buku"`
-	JumlahVideo     int `json:"jumlah_video"`
-	JumlahMateri    int `json:"jumlah_materi"`
+	JumlahMahasiswa int      `json:"jumlah_mahasiswa"`
+	JumlahKelas     int      `json:"jumlah_kelas"`
+	JumlahBuku      int      `json:"jumlah_buku"`
+	JumlahVideo     int      `json:"jumlah_video"`
+	JumlahMateri    int      `json:"jumlah_materi"`
+	Teacher         *Teacher `json:"teacher"`
 }
 
 type DashboardStudent struct {
-	JumlahKelasVerified int `json:"jumlah_kelas_verified"`
-	JumlahKelasNot      int `json:"jumlah_kelas_not"`
+	JumlahKelasVerified int      `json:"jumlah_kelas_verified"`
+	JumlahKelasNot      int      `json:"jumlah_kelas_not"`
+	JumlahTugas         int      `json:"jumlah_tugas"`
+	JumlahMateri        int      `json:"jumlah_materi"`
+	Student             *Student `json:"student"`
 }

@@ -107,6 +107,7 @@ func StartServer(handlers *config.Handlers) *gin.Engine {
 		teacher.DELETE("/assignments/:uuid", handlers.AssignmentHandler.DeleteAssignment)
 
 		teacher.PATCH("/answers/:answerUuid/grading", handlers.AssignmentHandler.GradeAnswer)
+		teacher.GET("/students/classes/:classUuid", handlers.UserHandler.GetStudentsByClass)
 	}
 
 	student := router.Group("api").Use(middleware.IsValidJWT(), middleware.IsRole("MAHASISWA"), middleware.SetUserUuid())

@@ -14,6 +14,7 @@ type Student struct {
 	UpdatedAt     int64  `gorm:"autoCreateTime:milli;autoUpdateTime:milli"`
 	User          *User
 	ClassRequests *[]ClassRequest
+	Classes       *[]StudentClasses
 }
 
 func (m *Student) BeforeCreate(tx *gorm.DB) error {
