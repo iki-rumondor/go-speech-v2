@@ -727,8 +727,8 @@ func (s *MasterService) CreateTeacher(req *request.CreateTeacher) error {
 			Name:     req.Name,
 			Password: req.Nidn,
 			Username: req.Nidn,
-			Active: true,
-			RoleID: 2,
+			Active:   true,
+			RoleID:   2,
 		},
 	}
 
@@ -829,6 +829,28 @@ func (s *MasterService) GetStudent(uuid string) (*response.Student, error) {
 	}
 
 	return &resp, nil
+}
+
+func (s *MasterService) CreateStudent(req *request.CreateStudent) error {
+	studentModel := models.Student{
+		Nim: req.Nim,
+		User: &models.User{
+			Name:     req.Name,
+			Password: req.Nim,
+			Username: req.Nim,
+			Active:   true,
+			RoleID:   3,
+		},
+	}
+
+	if err := s.Repo.Create(&studentModel); err != nil {
+		log.Println(err)
+		if utils.IsErrorType(err) {
+			return err
+		}
+		return response.SERVICE_INTERR
+	}
+	return nil
 }
 
 func (s *MasterService) UpdateStudent(uuid string, req *request.UpdateStudent) error {

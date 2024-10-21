@@ -44,6 +44,11 @@ type UpdateTeacher struct {
 	DepartmentUuid string `json:"department_uuid" valid:"required~field description tidak ditemukan"`
 }
 
+type CreateStudent struct {
+	Name string `json:"name" valid:"required~field nama tidak ditemukan"`
+	Nim  string `json:"nim" valid:"required~field nim tidak ditemukan"`
+}
+
 type UpdateStudent struct {
 	Name string `json:"name" valid:"required~field nama tidak ditemukan"`
 	Nim  string `json:"nim" valid:"required~field nim tidak ditemukan"`
