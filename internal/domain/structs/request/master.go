@@ -32,6 +32,12 @@ type UpdateVideo struct {
 	Description string `json:"description" valid:"required~field description tidak ditemukan"`
 }
 
+type CreateTeacher struct {
+	Name           string `json:"name" valid:"required~field nama tidak ditemukan"`
+	Nidn           string `json:"nidn" valid:"required~field nidn tidak ditemukan"`
+	DepartmentUuid string `json:"department_uuid" valid:"required~field description tidak ditemukan"`
+}
+
 type UpdateTeacher struct {
 	Name           string `json:"name" valid:"required~field nama tidak ditemukan"`
 	Nidn           string `json:"nidn" valid:"required~field nidn tidak ditemukan"`

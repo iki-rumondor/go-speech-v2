@@ -56,6 +56,7 @@ func StartServer(handlers *config.Handlers) *gin.Engine {
 		admin.DELETE("/department/:uuid", handlers.MasterHandler.DeleteDepartment)
 
 		admin.POST("/teachers/import", handlers.ImportHandler.ImportTeachers)
+		admin.POST("/teachers", handlers.MasterHandler.CreateTeacher)
 		admin.GET("/teachers", handlers.UserHandler.GetTeachers)
 		admin.GET("/teachers/:uuid", handlers.MasterHandler.GetTeacher)
 		admin.PUT("/teachers/:uuid", handlers.MasterHandler.UpdateTeacher)

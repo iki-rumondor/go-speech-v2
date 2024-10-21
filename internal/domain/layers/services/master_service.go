@@ -712,6 +712,36 @@ func (s *MasterService) GetTeacher(uuid string) (*response.Teacher, error) {
 	return &resp, nil
 }
 
+func (s *MasterService) CreateTeacher(req *request.CreateTeacher) error {
+	var department models.Department
+	condition := fmt.Sprintf("uuid = '%s'", req.DepartmentUuid)
+	if err := s.Repo.First(&department, condition); err != nil {
+		log.Println(err)
+		return response.SERVICE_INTERR
+	}
+
+	model := models.Teacher{
+		Nidn:         req.Nidn,
+		DepartmentID: department.ID,
+		User: &models.User{
+			Name:     req.Name,
+			Password: req.Nidn,
+			Username: req.Nidn,
+			Active: true,
+			RoleID: 2,
+		},
+	}
+
+	if err := s.Repo.Create(&model); err != nil {
+		log.Println(err)
+		if utils.IsErrorType(err) {
+			return err
+		}
+		return response.SERVICE_INTERR
+	}
+	return nil
+}
+
 func (s *MasterService) UpdateTeacher(uuid string, req *request.UpdateTeacher) error {
 	var department models.Department
 	condition := fmt.Sprintf("uuid = '%s'", req.DepartmentUuid)

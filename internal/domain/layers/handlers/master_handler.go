@@ -460,6 +460,26 @@ func (h *MasterHandler) GetTeacher(c *gin.Context) {
 	c.JSON(http.StatusOK, response.DATA_RES(resp))
 }
 
+func (h *MasterHandler) CreateTeacher(c *gin.Context) {
+	var body request.CreateTeacher
+	if err := c.BindJSON(&body); err != nil {
+		utils.HandleError(c, response.BADREQ_ERR(err.Error()))
+		return
+	}
+
+	if _, err := govalidator.ValidateStruct(&body); err != nil {
+		utils.HandleError(c, response.BADREQ_ERR(err.Error()))
+		return
+	}
+
+	if err := h.Service.CreateTeacher(&body); err != nil {
+		utils.HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, response.SUCCESS_RES("Dosen Berhasil Ditambahkan"))
+}
+
 func (h *MasterHandler) UpdateTeacher(c *gin.Context) {
 	var body request.UpdateTeacher
 	if err := c.BindJSON(&body); err != nil {
@@ -478,7 +498,7 @@ func (h *MasterHandler) UpdateTeacher(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, response.SUCCESS_RES("Dosen Berhasil Diperbarui"))
+	c.JSON(http.StatusOK, response.SUCCESS_RES("Dosen Berhasil Diperbarui"))
 }
 
 func (h *MasterHandler) DeleteTeacher(c *gin.Context) {
@@ -489,7 +509,7 @@ func (h *MasterHandler) DeleteTeacher(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, response.SUCCESS_RES("Dosen Berhasil Dihapus"))
+	c.JSON(http.StatusOK, response.SUCCESS_RES("Dosen Berhasil Dihapus"))
 }
 
 func (h *MasterHandler) GetStudents(c *gin.Context) {
@@ -532,7 +552,7 @@ func (h *MasterHandler) UpdateStudent(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, response.SUCCESS_RES("Data Mahasiswa Berhasil Diperbarui"))
+	c.JSON(http.StatusOK, response.SUCCESS_RES("Data Mahasiswa Berhasil Diperbarui"))
 }
 
 func (h *MasterHandler) DeleteStudent(c *gin.Context) {
@@ -543,6 +563,5 @@ func (h *MasterHandler) DeleteStudent(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, response.SUCCESS_RES("Data Mahasiswa Berhasil Dihapus"))
+	c.JSON(http.StatusOK, response.SUCCESS_RES("Data Mahasiswa Berhasil Dihapus"))
 }
-
