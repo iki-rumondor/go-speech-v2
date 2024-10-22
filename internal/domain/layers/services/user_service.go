@@ -663,3 +663,23 @@ func (s *UserService) GetStudentsByClass(classUuid string) (*[]response.Student,
 
 	return &resp, nil
 }
+
+func (s *UserService) GetAdminNotifications() (*[]response.Notification, error) {
+
+	notifications, err := s.Repo.GetAdminNotifications()
+	if err != nil {
+		log.Println(err)
+		return nil, response.SERVICE_INTERR
+	}
+
+	var resp []response.Notification
+
+	for _, item := range *notifications {
+		resp = append(resp, response.Notification{
+			Title: item.Title,
+			Body:  item.Body,
+		})
+	}
+
+	return &resp, nil
+}

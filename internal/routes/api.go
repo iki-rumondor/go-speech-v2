@@ -80,6 +80,8 @@ func StartServer(handlers *config.Handlers) *gin.Engine {
 		admin.DELETE("/classes/:uuid", handlers.MasterHandler.DeleteClass)
 		admin.GET("/classes/request", handlers.UserHandler.GetRequestClasses)
 		admin.PATCH("/classes/:uuid/request", handlers.UserHandler.UpdateStatusClassReq)
+
+		admin.GET("/admin/notifications", handlers.UserHandler.GetAdminNotifications)
 	}
 
 	teacher := router.Group("api").Use(middleware.IsValidJWT(), middleware.IsRole("DOSEN"), middleware.SetUserUuid())

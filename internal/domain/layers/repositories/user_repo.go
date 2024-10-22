@@ -208,3 +208,11 @@ func (r *UserRepo) GetDashboardStudent(studentID uint) (map[string]interface{}, 
 	return resp, nil
 
 }
+
+func (r *UserRepo) GetAdminNotifications() (*[]models.Notification, error) {
+	var resp []models.Notification
+	if err := r.db.Find(&resp).Error; err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}

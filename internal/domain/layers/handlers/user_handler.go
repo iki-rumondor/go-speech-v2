@@ -330,3 +330,13 @@ func (h *UserHandler) GetStudentsByClass(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response.DATA_RES(resp))
 }
+
+func (h *UserHandler) GetAdminNotifications(c *gin.Context) {
+	resp, err := h.Service.GetAdminNotifications()
+	if err != nil {
+		utils.HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, response.DATA_RES(resp))
+}

@@ -56,10 +56,6 @@ func freshDatabase(db *gorm.DB) error {
 		Name: "MAHASISWA",
 	})
 
-	db.Create(&models.Department{
-		Name: "Sistem Informasi",
-	})
-
 	return nil
 }
 

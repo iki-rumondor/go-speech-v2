@@ -28,4 +28,5 @@ type UserInterface interface {
 	GetStudentsByClass(classUuid string) (*[]models.Student, error)
 
 	GetDashboardStudent(studentID uint) (map[string]interface{}, error)
+	GetAdminNotifications() (*[]models.Notification, error)
 }

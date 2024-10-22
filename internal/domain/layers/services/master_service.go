@@ -550,6 +550,15 @@ func (s *MasterService) CreateMaterial(req *request.Material, videoName, bookNam
 		log.Println(err)
 	}
 
+	adminNotification := models.Notification{
+		Title: "Materi Baru",
+		Body:  fmt.Sprintf("materi telah ditambahkan oleh %s dengan judul materi %s", teacher.User.Name, model.Title),
+	}
+
+	if err := s.Repo.Create(&adminNotification); err != nil {
+		log.Println(err)
+	}
+
 	return nil
 }
 
